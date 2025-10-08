@@ -1,0 +1,207 @@
+/* styles.css */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --bg-light: #f8f9fa;
+    --border-color: #dee2e6;
+    --card-bg: #fff;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-light);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    max-width: 900px;
+    width: 100%;
+}
+
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-panel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 5px 5px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+h2, h3, h4 {
+    color: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-top: 15px;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: var(--secondary-color);
+    color: white;
+    transition: background-color 0.3s;
+    width: 100%; /* Para que se ajuste bien en la columna */
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.msg {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.badge {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.9em;
+}
+
+.role-badge {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Diseño de pestañas */
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tabBtn {
+    background-color: var(--bg-light);
+    color: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 5px 5px 0 0;
+    margin-right: 2px;
+    width: auto;
+}
+
+.tabBtn.active {
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    border-top: 2px solid var(--primary-color);
+    font-weight: bold;
+}
+
+/* Diseño de filas y columnas para formularios */
+.row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.col {
+    flex: 1;
+}
+
+.row.header-row {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.row.header-row h4 {
+    border-bottom: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Diseño de listas de datos */
+.list {
+    margin-top: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #f1f1f1;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item.success {
+    background-color: #d4edda;
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.item.error {
+    background-color: #f8d7da;
+    color: var(--error-color);
+}
+.status-msg {
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 5px 0;
+    margin: 0 10px;
+    /* Ajustes para el color basados en las variables definidas */
+    /* El color se establece dinámicamente en cliente.js */
+}
