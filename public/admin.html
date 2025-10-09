@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ERP simple - Administración</title>
+    <link rel="stylesheet" href="styles_admin.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <header class="header">
+            <h1>ERP simple - Panel de Administración</h1>
+            <div id="statusDisplay" class="status-msg">Conectado</div>
+            
+            <div id="userPanel" class="user-panel">
+                <!-- Estos valores se llenarán con JS al cargar la página -->
+                <span id="userName" class="badge">Usuario</span>
+                <span id="rolLabel" class="badge role-badge">ADMIN</span>
+                <button id="logoutBtn" class="btn secondary">Cerrar sesión</button>
+            </div>
+        </header>
+
+        <main id="panelSection" class="card">
+            <h2 class="section-title">Panel de Control Principal</h2>
+            
+            <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS -->
+            <nav class="tab-nav">
+                <button id="tab-inventario" class="active" onclick="switchTab('inventario')">Gestión de Inventario</button>
+                <button id="tab-catalogo" onclick="switchTab('catalogo')">Catálogos (Tallas, Categorías, Proveedores)</button>
+                <button id="tab-transacciones" onclick="switchTab('transacciones')">Transacciones y Reportes (Ventas, Clientes, Caja)</button>
+            </nav>
+            
+            <!-- 1. GESTIÓN DE INVENTARIO Y PRODUCTOS -->
+            <div id="inventarioPanel" class="panel tabContent">
+                <h3>Gestión de Productos</h3>
+                <div class="row header-row">
+                    <h4>Crear Producto</h4>
+                </div>
+                <div class="row form-row">
+                    <div class="col">
+                        <input id="prodNombre" placeholder="Nombre del Producto" class="input">
+                    </div>
+                    <div class="col">
+                        <input id="prodPrecio" placeholder="Precio" type="number" step="0.01" class="input">
+                    </div>
+                    <div class="col">
+                        <button id="btnCrearProd" class="btn primary">Crear Producto</button>
+                    </div>
+                </div>
+                
+                <div class="row header-row">
+                    <h4>Listado de Productos</h4>
+                </div>
+                <div class="row form-row">
+                    <div class="col">
+                        <input id="prodBuscar" placeholder="Buscar por nombre" class="input">
+                    </div>
+                    <div class="col" style="flex: 0 0 auto;">
+                        <button id="btnBuscarProd" class="btn secondary">Buscar</button>
+                    </div>
+                </div>
+                
+                <div id="adminProductos" class="list">
+                    <div class="item">Cargando lista de productos...</div>
+                </div>
+            </div>
+
+            <!-- 2. CATÁLOGOS: TALLAS, CATEGORÍAS, PROVEEDORES -->
+            <div id="catalogoPanel" class="panel tabContent" style="display:none;">
+                <h2 style="color: #3b82f6;">Configuración de Catálogos</h2>
+                
+                <!-- Gestión de Categorías (Ejemplo de CRUD simple) -->
+                <h3>Gestión de Categorías</h3>
+                <div class="row form-row">
+                    <div class="col">
+                        <input id="catNombre" placeholder="Nueva Categoría (Ej: Camisetas)" class="input">
+                    </div>
+                    <div class="col" style="flex: 0 0 auto;">
+                        <button id="btnCrearCat" class="btn primary">Crear Categoría</button>
+                    </div>
+                </div>
+                <div id="catalogoCategorias" class="list">
+                    <div class="item">Cargando categorías...</div>
+                </div>
+                
+                <!-- Placeholder para Tallas -->
+                <h3>Gestión de Tallas (S, M, L, XL)</h3>
+                <div id="catalogoTallas" class="list">
+                    <div class="item">Funcionalidad pendiente...</div>
+                </div>
+                
+                <!-- Placeholder para Proveedores -->
+                <h3>Gestión de Proveedores</h3>
+                <div id="catalogoProveedores" class="list">
+                    <div class="item">Funcionalidad pendiente...</div>
+                </div>
+            </div>
+
+            <!-- 3. TRANSACCIONES Y REPORTES -->
+            <div id="transaccionesPanel" class="panel tabContent" style="display:none;">
+                <h2 style="color: #3b82f6;">Reportes y Movimientos</h2>
+                
+                <!-- Placeholder para Ventas -->
+                <h3>Listado de Ventas (Facturas)</h3>
+                <div id="reporteVentas" class="list">
+                    <div class="item">Cargando ventas recientes...</div>
+                </div>
+
+                <!-- Placeholder para Movimientos de Caja -->
+                <h3>Movimientos Contables y de Caja</h3>
+                <div id="reporteCaja" class="list">
+                    <div class="item">Cargando movimientos contables...</div>
+                </div>
+                
+                <!-- Placeholder para Clientes -->
+                <h3>Listado de Clientes</h3>
+                <div id="reporteClientes" class="list">
+                    <div class="item">Cargando lista de clientes...</div>
+                </div>
+                
+                <!-- Placeholder para Compras -->
+                <h3>Listado de Órdenes de Compra</h3>
+                <div id="reporteCompras" class="list">
+                    <div class="item">Cargando lista de compras...</div>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+    <script src="cliente.js"></script>
+</body>
+</html>

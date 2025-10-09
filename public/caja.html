@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ERP simple - Caja</title>
+  <link rel="stylesheet" href="styles_caja.css">
+</head>
+<body>
+  <div id="app" class="container">
+    <header class="header">
+      <h1>ERP simple - Módulo de Caja</h1>
+      <div id="statusDisplay" class="status-msg">Conectado</div>
+      
+      <div id="userPanel" class="user-panel">
+        <!-- Estos valores se llenarán con JS al cargar la página -->
+        <span id="userName" class="badge"></span>
+        <span id="rolLabel" class="badge role-badge">CAJA</span>
+        <button id="logoutBtn" class="btn">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <main id="panelSection" class="card">
+      <h2>Registro de Ventas Rápidas</h2>
+      
+      <div id="cajaPanel" class="panel tabContent">
+        <div class="row header-row">
+          <h4>Nueva Transacción</h4>
+        </div>
+        <div class="row form-row">
+          <div class="col">
+            <input id="ventaCliente" placeholder="ID Cliente (opcional)" class="input">
+          </div>
+          <div class="col">
+            <input id="ventaTotal" placeholder="Total venta" type="number" step="0.01" class="input">
+          </div>
+          <div class="col">
+            <button id="btnNuevaVenta" class="btn primary">Registrar venta</button>
+          </div>
+        </div>
+        <div id="ventaDetalle" class="list">
+           <div class="item">Ventas registradas aparecerán aquí.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="cliente.js"></script>
+</body>
+</html>

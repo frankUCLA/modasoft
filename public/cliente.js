@@ -1,224 +1,184 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Elementos del DOM
-  const loginSection = document.getElementById('loginSection');
-  const panelSection = document.getElementById('panelSection');
-  const loginBtn = document.getElementById('loginBtn');
-  const usuarioEl = document.getElementById('usuario');
-  const passwordEl = document.getElementById('password');
-  const loginMsg = document.getElementById('loginMsg');
-  const userPanel = document.getElementById('userPanel');
-  const userName = document.getElementById('userName');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const rolLabel = document.getElementById('rolLabel');
-  const adminPanel = document.getElementById('adminPanel');
-  const cajaPanel = document.getElementById('cajaPanel');
-  const btnCrearProd = document.getElementById('btnCrearProd');
-  const prodNombre = document.getElementById('prodNombre');
-  const prodPrecio = document.getElementById('prodPrecio');
-  const btnBuscarProd = document.getElementById('btnBuscarProd');
-  const prodBuscar = document.getElementById('prodBuscar');
-  const adminProductos = document.getElementById('adminProductos');
-  const btnNuevaVenta = document.getElementById('btnNuevaVenta');
-  const ventaTotal = document.getElementById('ventaTotal');
-  const ventaCliente = document.getElementById('ventaCliente');
-  const ventaDetalle = document.getElementById('ventaDetalle');
-  
-  // NUEVO: Referencia al elemento de estado de conexión
-  const statusDisplay = document.getElementById('statusDisplay'); 
-
-  // Estado actual
-  let currentTab = 'admin'; // 'admin' o 'caja'
-  const tabs = document.querySelectorAll('.tabBtn');
-  tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
-
-  // Inicio
-  checkStatus();
-
-  // Eventos
-  loginBtn.addEventListener('click', async () => {
-    const usuario = usuarioEl.value.trim();
-    const password = passwordEl.value.trim();
-    if (!usuario || !password) {
-      loginMsg.textContent = 'Ingresa usuario y contraseña';
-      loginMsg.style.color = 'red';
-      return;
-    }
-    // Llamada de login (necesitas endpoint /api/login en backend)
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ usuario, password }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        loginMsg.textContent = 'Login exitoso';
-        loginMsg.style.color = 'green';
-        // Refrescar estado
-        await checkStatus();
-      } else {
-        loginMsg.textContent = data.error || 'Error de login';
-        loginMsg.style.color = 'red';
-      }
-    } catch (e) {
-      loginMsg.textContent = 'Error de conexión';
-      loginMsg.style.color = 'red';
-    }
-  });
-
-  logoutBtn.addEventListener('click', async () => {
-    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-    // Refrescar estado
-    await checkStatus();
-  });
-
-  btnCrearProd.addEventListener('click', async () => {
-    const nombre = prodNombre.value.trim();
-    const precio = parseFloat(prodPrecio.value);
-    if (!nombre || isNaN(precio) || precio <= 0) {
-      alert('Ingrese nombre y precio válidos');
-      return;
-    }
-    try {
-      // id_categoria: 1 es un valor de ejemplo que espera el backend
-      const res = await fetch('/api/admin/productos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ nombre, descripcion: 'Nuevo producto', precio_venta: precio, id_categoria: 1 }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        prodNombre.value = '';
-        prodPrecio.value = '';
-        alert('Producto creado con ID: ' + data.id_producto);
-        loadAdminProductos();
-      } else {
-        alert('Error al crear producto: ' + (data.error || 'Desconocido'));
-      }
-    } catch (e) {
-      alert('Error de red al crear producto');
-    }
-  });
-
-  btnBuscarProd.addEventListener('click', async () => {
-    const q = prodBuscar.value.trim();
-    await loadAdminProductos(q);
-  });
-  
-  btnNuevaVenta.addEventListener('click', async () => {
-    const cliente = ventaCliente.value.trim();
-    const total = parseFloat(ventaTotal.value);
+    // 1. Elementos del DOM
+    const loginSection = document.getElementById('loginSection');
+    const loginBtn = document.getElementById('loginBtn');
+    const usuarioEl = document.getElementById('usuario');
+    const passwordEl = document.getElementById('password');
+    const loginMsg = document.getElementById('loginMsg');
+    const statusDisplay = document.getElementById('statusDisplay');
+    // Elemento genérico para cerrar sesión (espera ser usado en otros HTML)
+    const logoutBtn = document.getElementById('logoutBtn'); 
     
-    if (isNaN(total) || total <= 0) {
-      alert('Ingrese un total de venta válido');
-      return;
-    }
-
-    // La ruta de caja en el backend espera { monto, id_cliente }
-    try {
-      const res = await fetch('/api/caja/venta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ id_cliente: cliente || null, monto: total }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        ventaTotal.value = '';
-        ventaCliente.value = '';
-        ventaDetalle.innerHTML = `<div class="item success">Venta registrada (ID: ${data.id_venta}): ${total.toFixed(2)}</div>`;
-      } else {
-        alert(data.error || 'Error al registrar venta');
-      }
-    } catch (e) {
-      alert('Error de red al registrar venta');
-    }
-  });
-
-  // Funciones de utilidad
-  async function checkStatus() {
-    try {
-      const res = await fetch('/api/status', { credentials: 'include' });
-      const data = await res.json();
-      
-      // NUEVO: Mostrar estado del Servidor y BD
-      const servidorStatus = data.servidor ? 'Servidor: ✅ OK' : 'Servidor: ❌ FAIL';
-      const bdStatus = data.bd ? 'BD: ✅ OK' : 'BD: ❌ FAIL';
-      statusDisplay.textContent = `${servidorStatus} | ${bdStatus}`;
-      statusDisplay.style.color = (data.servidor && data.bd) ? 'var(--success-color)' : 'var(--error-color)';
-      
-      if (data.servidor && data.bd && data.usuario) {
-        // Autenticado
-        loginSection.style.display = 'none';
-        panelSection.style.display = 'block';
-        userPanel.classList.remove('hidden');
-        
-        userName.textContent = data.usuario;
-        rolLabel.textContent = data.rol || 'Usuario';
-        
-        // Cargar panel según rol
-        const rol = (data.rol || '').toLowerCase();
-        if (rol === 'administrador') {
-          switchTab('admin');
-          await loadAdminProductos();
-        } else if (rol === 'caja') {
-          switchTab('caja');
-        } else {
-          // Rol desconocido: mostrar panel por defecto
-          switchTab(currentTab);
+    /**
+     * Función reutilizable para cerrar la sesión.
+     */
+    async function handleLogout() {
+        if (loginMsg) loginMsg.textContent = 'Cerrando sesión...';
+        try {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+        } catch (e) {
+            console.error('Error al intentar cerrar sesión:', e);
         }
-      } else {
-        // No autenticado
-        loginSection.style.display = 'block';
-        panelSection.style.display = 'none';
-        userPanel.classList.add('hidden');
-      }
-    } catch (e) {
-      // Si falla la solicitud, sugiere conectar
-      statusDisplay.textContent = 'Servidor: ❌ OFFLINE | BD: ❌ DESCONOCIDA';
-      statusDisplay.style.color = 'var(--error-color)';
-      loginSection.style.display = 'block';
-      panelSection.style.display = 'none';
-      userPanel.classList.add('hidden');
-      loginMsg.textContent = 'Error de conexión con el servidor (ver consola)';
-      loginMsg.style.color = 'red';
-      console.error(e);
+        // Recargar la página para limpiar el estado y volver al login
+        window.location.href = 'index.html'; // Siempre volvemos al index.html
     }
-  }
 
-  async function loadAdminProductos(q = '') {
-    try {
-      const query = q ? `?q=${q}` : '';
-      const res = await fetch(`/api/admin/productos${query}`, { credentials: 'include' });
-      const data = await res.json();
-      
-      if (data.productos) {
-        adminProductos.innerHTML = data.productos.map(p => `  
-          <div class="item">  
-            ID: ${p.id_producto} | ${p.nombre} | $${parseFloat(p.precio_venta).toFixed(2)}  
-          </div>  
-        `).join('');
-      } else {
-        adminProductos.innerHTML = '<div class="item">No hay productos. Intenta crear uno.</div>';
-      }
-    } catch (e) {
-      adminProductos.innerHTML = '<div class="item error">Error al cargar productos (Permiso/Red)</div>';
-    }
-  }
 
-  function switchTab(tab) {
-    currentTab = tab;
-    if (tab === 'admin') {
-      adminPanel.style.display = 'block';
-      cajaPanel.style.display = 'none';
-    } else {
-      adminPanel.style.display = 'none';
-      cajaPanel.style.display = 'block';
+    /**
+     * Función que chequea el estado del servidor y la sesión.
+     * @param {boolean} shouldRedirect - Si es true, redirige al usuario según su rol si está autenticado.
+     */
+    async function checkStatus(shouldRedirect = false) {
+        if (!statusDisplay || !loginSection) return;
+
+        statusDisplay.textContent = 'Cargando estado...';
+        statusDisplay.style.color = 'gray';
+        if (loginMsg) loginMsg.textContent = '';
+        
+        try {
+            const res = await fetch('/api/status', { credentials: 'include' });
+            const data = await res.json();
+            
+            // 3.1. Actualizar indicador de estado
+            const servidorStatus = data.servidor ? 'Servidor: ✅ OK' : 'Servidor: ❌ FAIL';
+            const bdStatus = data.bd ? 'BD: ✅ OK' : 'BD: ❌ FAIL';
+            statusDisplay.textContent = `${servidorStatus} | ${bdStatus}`;
+            statusDisplay.style.color = (data.servidor && data.bd) ? '#10b981' : '#ef4444'; 
+            
+            // 3.2. Manejo de autenticación
+            if (data.servidor && data.bd && data.usuario) {
+                const rol = (data.rol || '').toLowerCase();
+                
+                if (shouldRedirect) {
+                    // Solo redirigimos si es un login EXITOSO (shouldRedirect=true)
+                    if (rol === 'administrador') {
+                        window.location.href = 'admin.html';
+                    } else if (rol === 'caja') {
+                        window.location.href = 'caja.html';
+                    } else {
+                        // Rol no reconocido, mostramos mensaje de sesión activa aquí
+                        displayActiveSession(data, rol);
+                    }
+                } else {
+                    // Sesión activa en carga inicial, PERO NO REDIRIGIMOS
+                    // Mostramos el mensaje de sesión activa en lugar del formulario.
+                    displayActiveSession(data, rol);
+                }
+            } else {
+                // No autenticado: Mostrar el formulario de login.
+                if (loginSection) loginSection.style.display = 'block';
+                if (loginMsg) {
+                    loginMsg.textContent = 'Introduce tus credenciales para continuar.';
+                    loginMsg.style.color = '#3b82f6';
+                }
+            }
+        } catch (e) {
+            // Falla de red/servidor apagado
+            statusDisplay.textContent = 'Servidor: ❌ OFFLINE | BD: ❌ DESCONOCIDA';
+            statusDisplay.style.color = '#ef4444';
+            if (loginMsg) {
+                loginMsg.textContent = 'Error: No se pudo conectar con el servidor. Revise Node.js.';
+                loginMsg.style.color = '#ef4444';
+            }
+            console.error('Fallo grave de conexión:', e);
+        }
     }
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  }
-   // Inicializar estado de tabs
-  switchTab(currentTab);
+
+    // Nueva función para mostrar la sesión activa y el botón de logout
+    function displayActiveSession(data, rol) {
+        // En index.html, reemplazamos el formulario de login
+        if (loginSection) {
+            loginSection.innerHTML = `
+                <h2 style="color: #3b82f6;">Sesión Activa</h2>
+                <p style="padding: 15px; background: #e0f2fe; border-radius: 4px; margin-top: 15px;">
+                    Bienvenido, <strong>${data.usuario}</strong> (${data.rol || 'Usuario'}). 
+                    <br>Por favor, usa el botón de abajo para ir a tu panel o cerrar sesión.
+                    <br>Tu rol es: <strong>${rol.toUpperCase()}</strong>
+                </p>
+                <button id="goToPanelBtn" class="btn primary" style="margin-top: 15px;">Ir a mi Panel</button>
+                <button id="logoutDummyBtn" class="btn secondary" style="margin-top: 15px;">Cerrar sesión</button>
+            `;
+            
+            const logoutDummyBtn = document.getElementById('logoutDummyBtn');
+            const goToPanelBtn = document.getElementById('goToPanelBtn');
+
+            if (logoutDummyBtn) {
+                logoutDummyBtn.addEventListener('click', handleLogout);
+            }
+
+            if (goToPanelBtn) {
+                goToPanelBtn.addEventListener('click', () => {
+                    // Forzamos la redirección manual al panel correcto
+                    const targetRol = (data.rol || '').toLowerCase();
+                    if (targetRol === 'administrador') {
+                        window.location.href = 'admin.html';
+                    } else if (targetRol === 'caja') {
+                        window.location.href = 'caja.html';
+                    } else {
+                        // En el entorno real, usarías un modal o mensaje.
+                        alert('Tu rol no tiene un panel de destino definido.'); 
+                    }
+                });
+            }
+        }
+    }
+
+
+    // 4. Eventos
+    // Evento de Login (Solo en index.html)
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const usuario = usuarioEl.value.trim();
+            const password = passwordEl.value.trim();
+            if (loginMsg) loginMsg.textContent = ''; 
+
+            if (!usuario || !password) {
+                if (loginMsg) {
+                    loginMsg.textContent = 'Ingresa usuario y contraseña';
+                    loginMsg.style.color = '#ef4444'; 
+                }
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ usuario, password }),
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (loginMsg) {
+                        loginMsg.textContent = 'Login exitoso, redirigiendo...';
+                        loginMsg.style.color = '#10b981';
+                    }
+                    // Redirigimos SÓLO después de un login exitoso (checkStatus(true))
+                    await checkStatus(true); 
+                } else {
+                    if (loginMsg) {
+                        loginMsg.textContent = data.error || 'Error de login. Credenciales inválidas.';
+                        loginMsg.style.color = '#ef4444';
+                    }
+                    if (passwordEl) passwordEl.value = '';
+                }
+            } catch (e) {
+                if (loginMsg) {
+                    loginMsg.textContent = 'Error de conexión con el servidor.';
+                    loginMsg.style.color = '#ef4444';
+                }
+            }
+        });
+    }
+
+    // 5. Inicialización
+    // Llama a checkStatus(false) para verificar el estado de la conexión PERO NO REDIRIGIR AUTOMÁTICAMENTE
+    // Si hay una sesión activa en index.html, muestra el mensaje de "Sesión Activa".
+    checkStatus(false);
+    
+    // 6. Listener para el botón genérico de Logout
+    // Esto hace que el mismo script funcione en admin.html y caja.html si tienen un elemento con ID 'logoutBtn'
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
 });

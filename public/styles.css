@@ -1,207 +1,184 @@
-/* styles.css */
+/*
+ * styles_login.css - Estilo Futurista Corporativo para Login
+ */
+
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #6c757d;
-    --success-color: #28a745;
+    --primary-color: #007bff;   /* Azul de acento (Serio) */
+    --secondary-color: #6c757d; 
+    --background-dark: #0a0a0a; 
+    --surface-dark: #1e1e1e;    
+    --text-light: #f0f0f0;      
+    --border-color: #333;
+    --shadow-tech: 0 0 15px rgba(0, 123, 255, 0.4);
     --error-color: #dc3545;
-    --bg-light: #f8f9fa;
-    --border-color: #dee2e6;
-    --card-bg: #fff;
 }
 
+/* ------------------- Globales y Centrado CLAVE ------------------- */
 body {
-    font-family: Arial, sans-serif;
-    background-color: var(--bg-light);
+    font-family: 'Roboto Mono', 'Consolas', monospace;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    
+    /* 🔑 CLAVE: FUERZA EL BODY A OCUPAR 100% Y USA FLEX PARA CENTRAR */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center; 
 }
 
 .container {
-    max-width: 900px;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
 }
 
+/* ------------------- Área de Contenido Principal (Login) ------------------- */
+.main {
+    /* 🔑 Centra la tarjeta vertical y horizontalmente dentro del espacio restante */
+    flex-grow: 1; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+    position: static; 
+}
+
+/* ------------------- Tarjeta de Login (Card) ------------------- */
+.card {
+    background: var(--surface-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 35px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), var(--shadow-tech);
+    width: 100%;
+    max-width: 350px; 
+    color: var(--text-light);
+    margin: auto; 
+}
+
+/* Resto de estilos (Header, Inputs, Botones, etc.) */
 .header {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 5px 5px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--primary-color);
+    box-shadow: 0 1px 0 var(--primary-color); 
 }
 
-.user-panel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--primary-color);
 }
 
-.card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0 0 5px 5px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.section {
-    margin-bottom: 20px;
-}
-
-h2, h3, h4 {
+.status-msg {
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 2px;
     color: var(--secondary-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 5px;
-    margin-top: 15px;
+}
+
+#loginSection {
+    text-align: center;
+}
+
+#loginSection h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: var(--text-light);
+    font-weight: 500;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
+    text-transform: uppercase;
 }
 
 .field {
-    margin-bottom: 15px;
+    text-align: left;
+    margin-bottom: 20px;
+    position: relative;
 }
 
-.field label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+.field label { display: none; }
 
-.input {
+.field input {
     width: 100%;
-    padding: 8px;
+    padding: 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    background-color: var(--background-dark); 
+    color: var(--text-light);
+    font-size: 0.9em;
     box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    padding-left: 40px !important; 
 }
 
+.field input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-tech);
+}
+
+/* ÍCONOS */
+#loginSection .field:nth-child(1)::before {
+    content: '👤'; 
+    position: absolute;
+    top: 50%; 
+    transform: translateY(-50%);
+    left: 10px;
+    font-size: 1em;
+    color: var(--secondary-color);
+    z-index: 10;
+}
+
+#loginSection .field:nth-child(2)::before {
+    content: '🔒'; 
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    font-size: 1em;
+    color: var(--secondary-color);
+    z-index: 10;
+}
+
+/* Botones */
 .btn {
-    padding: 8px 15px;
+    padding: 12px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    background-color: var(--secondary-color);
-    color: white;
-    transition: background-color 0.3s;
-    width: 100%; /* Para que se ajuste bien en la columna */
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-transform: uppercase;
 }
 
-.btn.primary {
+.btn.primary, #loginBtn {
     background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    margin-top: 15px;
+    box-shadow: var(--shadow-tech);
 }
 
-.btn:hover {
-    opacity: 0.9;
+.btn.primary:hover {
+    background-color: #0056b3; 
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
 }
 
 .msg {
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
-}
-
-.badge {
-    background-color: #e9ecef;
-    color: #495057;
-    padding: 5px 10px;
-    border-radius: 12px;
-    font-size: 0.9em;
-}
-
-.role-badge {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Diseño de pestañas */
-.tabs {
-    display: flex;
-    margin-bottom: 15px;
-}
-
-.tabBtn {
-    background-color: var(--bg-light);
-    color: var(--secondary-color);
-    border: 1px solid var(--border-color);
-    border-bottom: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: all 0.3s;
-    border-radius: 5px 5px 0 0;
-    margin-right: 2px;
-    width: auto;
-}
-
-.tabBtn.active {
-    background-color: var(--card-bg);
-    color: var(--primary-color);
-    border-top: 2px solid var(--primary-color);
-    font-weight: bold;
-}
-
-/* Diseño de filas y columnas para formularios */
-.row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 10px;
-    align-items: center;
-}
-
-.col {
-    flex: 1;
-}
-
-.row.header-row {
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-
-.row.header-row h4 {
-    border-bottom: none;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-/* Diseño de listas de datos */
-.list {
     margin-top: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.item {
-    padding: 10px;
-    border-bottom: 1px solid var(--border-color);
-    background-color: #f1f1f1;
-}
-
-.item:last-child {
-    border-bottom: none;
-}
-
-.item.success {
-    background-color: #d4edda;
-    color: var(--success-color);
-    font-weight: bold;
-}
-
-.item.error {
-    background-color: #f8d7da;
-    color: var(--error-color);
-}
-.status-msg {
     font-size: 0.9em;
     font-weight: bold;
-    padding: 5px 0;
-    margin: 0 10px;
-    /* Ajustes para el color basados en las variables definidas */
-    /* El color se establece dinámicamente en cliente.js */
+    color: var(--error-color);
 }

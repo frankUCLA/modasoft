@@ -1,0 +1,155 @@
+/*
+ * styles_caja.css - Estilo para Panel de Caja
+ * Acento verde (Success) para un look transaccional y de dinero.
+ */
+
+:root {
+    --primary-color: #28a745;   /* Verde de Transacción */
+    --secondary-color: #6c757d; 
+    --background-dark: #0a0a0a; 
+    --surface-dark: #1e1e1e;    
+    --text-light: #f0f0f0;      
+    --border-color: #333;
+    --shadow-tech: 0 0 10px rgba(40, 167, 69, 0.3);
+    --success-color: #28a745;
+    --error-color: #dc3545;
+}
+
+body {
+    font-family: 'Roboto Mono', 'Consolas', monospace;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--primary-color);
+    box-shadow: 0 1px 0 var(--primary-color); 
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+/* Panel de usuario */
+.user-panel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 15px;
+    background-color: var(--surface-dark);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    font-size: 0.85em;
+}
+.role-badge {
+    background-color: var(--primary-color);
+    color: white;
+}
+.status-msg {
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: 1px solid var(--primary-color);
+    border-radius: 2px;
+    color: var(--primary-color);
+}
+
+/* Contenido Principal (Card) */
+.card {
+    max-width: 600px; /* Más estrecho para caja */
+    margin: 50px auto;
+    padding: 30px;
+    background: var(--surface-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    color: var(--text-light);
+}
+
+.card h2 {
+    color: var(--text-light);
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 15px; /* Más grande para fácil uso en caja */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-size: 1.1em;
+    box-sizing: border-box;
+}
+
+/* Botones */
+.btn {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn.primary:hover {
+    background-color: #1e7e34; /* Verde más oscuro al pasar el mouse */
+}
+#logoutBtn {
+    background: var(--surface-dark);
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+}
+
+/* Listas */
+.list {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    min-height: 100px;
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: rgba(40, 167, 69, 0.05); 
+}
+
+.list .item {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+    font-size: 1em;
+}
