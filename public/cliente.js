@@ -1,4 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ADMINISTRADOR: Listado, edición y eliminación de productos ---
+    const adminProductos = document.getElementById('adminProductos');
+    async function cargarProductos() {
+        try {
+            const res = await fetch('/api/admin/productos');
+            const data = await res.json();
+            if (adminProductos) {
+                adminProductos.innerHTML = '';
+                if (data.productos.length === 0) {
+                    adminProductos.innerHTML = '<div class="item">No hay productos registrados.</div>';
+                } else {
+                    data.productos.forEach(prod => {
+                        const div = document.createElement('div');
+                        div.className = 'item';
+                        div.innerHTML = `<b>${prod.nombre}</b> | Marca: ${prod.marca || ''} | Precio: $${prod.precio_venta} <button class='btn' onclick='editarProducto(${prod.id_producto})'>Editar</button> <button class='btn danger' onclick='eliminarProducto(${prod.id_producto})'>Eliminar</button>`;
+                        adminProductos.appendChild(div);
+                    });
+                }
+            }
+        } catch { adminProductos.innerHTML = '<div class="item">Error al cargar productos.</div>'; }
+    }
+    window.editarProducto = function(id) {
+        alert('Funcionalidad de edición en desarrollo.');
+        // Aquí puedes abrir un modal o formulario para editar el producto
+    };
+    window.eliminarProducto = async function(id) {
+        if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
+        try {
+            const res = await fetch(`/api/admin/productos/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.ok) {
+                cargarProductos();
+            } else {
+                alert('Error al eliminar producto');
+            }
+        } catch { alert('Error de conexión'); }
+    };
+    // Cargar productos al iniciar
+    cargarProductos();
     // --- ADMINISTRADOR: Registro de Categorías ---
     const formCategoria = document.getElementById('form-categoria');
     const catalogoCategorias = document.getElementById('catalogoCategorias');

@@ -144,6 +144,16 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
   }
 });
 // Listar productos (GET)
+// Eliminar producto (DELETE)
+app.delete('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM Productos WHERE id_producto = ?', [id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 app.get('/api/admin/productos', requiereRol('administrador'), async (req, res) => {
   const { q } = req.query;
   try {
