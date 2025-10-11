@@ -279,7 +279,7 @@ app.get('/api/clientes/buscar', requiereRol('caja'), async (req, res) => {
 });
 // Nuevo endpoint: Registro de ventas completo (usado por caja.html)
 app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
-  const { cliente_nombre, cliente_cedula, marca, talla, cantidad, precio_unitario, total_dolar, total_bs, tipo_pago } = req.body;
+  const { cliente_nombre, cliente_cedula, cliente_telefono, cliente_email, marca, talla, cantidad, precio_unitario, total_dolar, total_bs, tipo_pago } = req.body;
   try {
     // 1. Buscar o crear cliente
     let id_cliente = null;
@@ -287,7 +287,7 @@ app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
     if (cliRows.length > 0) {
       id_cliente = cliRows[0].id_cliente;
     } else {
-      const [cliRes] = await pool.query('INSERT INTO Clientes (nombre, telefono) VALUES (?, ?)', [cliente_nombre, cliente_cedula]);
+      const [cliRes] = await pool.query('INSERT INTO Clientes (nombre, telefono, email) VALUES (?, ?, ?)', [cliente_nombre, cliente_cedula, cliente_telefono || '']);
       id_cliente = cliRes.insertId;
     }
     // 2. Registrar venta principal
