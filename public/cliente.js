@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Mostrar tallas dinámicas en registro de producto ---
+    const tallasDinamicasDiv = document.getElementById('tallas-dinamicas');
+    async function mostrarTallasDinamicas() {
+        if (!tallasDinamicasDiv) return;
+        try {
+            const res = await fetch('/api/tallas');
+            const data = await res.json();
+            tallasDinamicasDiv.innerHTML = '';
+            data.tallas.forEach(talla => {
+                const label = document.createElement('label');
+                label.style.marginRight = '10px';
+                label.innerHTML = `<b>${talla.nombre}</b> <input type='number' min='0' value='0' style='width:60px;' name='cantidad_talla_${talla.id_talla}' data-id-talla='${talla.id_talla}'>`;
+                tallasDinamicasDiv.appendChild(label);
+            });
+        } catch {}
+    }
+    mostrarTallasDinamicas();
     // --- ADMINISTRADOR: Gestión de Tallas ---
     const formTalla = document.getElementById('form-talla');
     const catalogoTallas = document.getElementById('catalogoTallas');
@@ -14,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     data.tallas.forEach(talla => {
                         const div = document.createElement('div');
                         div.className = 'item';
-                        div.innerHTML = `${talla.nombre} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarTalla(${talla.id_talla})'>Eliminar</button>`;
+                        div.innerHTML = `<b>${talla.nombre}</b> | Ajuste: ${talla.ajuste || ''} | Pecho: ${talla.pecho || '-'} | Cintura: ${talla.cintura || '-'} | Cadera: ${talla.cadera || '-'} | Largo: ${talla.largo || '-'} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarTalla(${talla.id_talla})'>Eliminar</button>`;
                         catalogoTallas.appendChild(div);
                     });
                 }
@@ -25,12 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
         formTalla.addEventListener('submit', async (e) => {
             e.preventDefault();
             const nombre = document.getElementById('tallaNombre').value.trim();
-            if (!nombre) return;
+            const ajuste = document.getElementById('tallaAjuste').value;
+            const pecho = parseInt(document.getElementById('tallaPecho').value) || null;
+            const cintura = parseInt(document.getElementById('tallaCintura').value) || null;
+            const cadera = parseInt(document.getElementById('tallaCadera').value) || null;
+            const largo = parseInt(document.getElementById('tallaLargo').value) || null;
+            if (!nombre || !ajuste) return;
             try {
                 const res = await fetch('/api/tallas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre })
+                    body: JSON.stringify({ nombre, ajuste, pecho, cintura, cadera, largo })
                 });
                 const data = await res.json();
                 if (data.ok) {
@@ -316,30 +338,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = document.getElementById('prodNombre').value.trim();
             const precio = parseFloat(document.getElementById('prodPrecio').value);
             const inventario = parseInt(document.getElementById('prodInventario').value);
-            const talla_s = parseInt(document.getElementById('talla_s').value);
-            const talla_m = parseInt(document.getElementById('talla_m').value);
-            const talla_l = parseInt(document.getElementById('talla_l').value);
-            const talla_xl = parseInt(document.getElementById('talla_xl').value);
-
+            // Obtener cantidades por talla
+            const cantidades = [];
+            if (tallasDinamicasDiv) {
+                const inputs = tallasDinamicasDiv.querySelectorAll('input[type="number"]');
+                inputs.forEach(input => {
+                    const id_talla = input.getAttribute('data-id-talla');
+                    const cantidad = parseInt(input.value) || 0;
+                    cantidades.push({ id_talla, cantidad });
+                });
+            }
             // Validación básica
             if (!marca || !categoria || !proveedor || !nombre || isNaN(precio) || isNaN(inventario)) {
                 alert('Completa todos los campos obligatorios.');
                 return;
             }
-
             // Enviar al backend
             try {
                 const res = await fetch('/api/productos', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ marca, categoria, proveedor, nombre, precio, inventario, talla_s, talla_m, talla_l, talla_xl })
+                    body: JSON.stringify({ marca, categoria, proveedor, nombre, precio, inventario, cantidades })
                 });
                 const data = await res.json();
                 if (data.ok) {
                     alert('Producto registrado correctamente.');
                     formProductoAdmin.reset();
+                    mostrarTallasDinamicas();
                 } else {
-                    alert('Error al registrar producto: ' + (data.error || '')); 
+                    alert('Error al registrar producto: ' + (data.error || ''));
                 }
             } catch (err) {
                 alert('Error de conexión al guardar producto.');

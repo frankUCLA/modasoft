@@ -113,15 +113,12 @@
                                             <input id="prodInventario" placeholder="Inventario total" type="number" min="0" class="input" required>
                                         </div>
                                     </div>
-                                    <div class="row form-row">
-                                        <fieldset style="border:1px solid #ccc; padding:10px;">
-                                            <legend>Tallas y Cantidades</legend>
-                                            <label>S:<input type="number" id="talla_s" min="0" value="0" style="width:60px;"></label>
-                                            <label>M:<input type="number" id="talla_m" min="0" value="0" style="width:60px;"></label>
-                                            <label>L:<input type="number" id="talla_l" min="0" value="0" style="width:60px;"></label>
-                                            <label>XL:<input type="number" id="talla_xl" min="0" value="0" style="width:60px;"></label>
-                                        </fieldset>
-                                    </div>
+                                                        <div class="row form-row">
+                                                            <fieldset style="border:1px solid #ccc; padding:10px;">
+                                                                <legend>Tallas y Cantidades</legend>
+                                                                <div id="tallas-dinamicas"></div>
+                                                            </fieldset>
+                                                        </div>
                                     <div class="row form-row">
                                         <button id="btnCrearProd" class="btn primary" type="submit">Registrar Producto</button>
                                     </div>
@@ -166,7 +163,27 @@
                 <h3>Gestión de Tallas (S, M, L, XL)</h3>
                 <form id="form-talla" class="row form-row">
                     <div class="col">
-                        <input id="tallaNombre" name="tallaNombre" placeholder="Nueva Talla (Ej: S, M, L, XL)" class="input" required maxlength="10">
+                        <input id="tallaNombre" name="tallaNombre" placeholder="Nombre de Talla (Ej: S, M, L, XL, 38)" class="input" required maxlength="10">
+                    </div>
+                    <div class="col">
+                        <select id="tallaAjuste" name="tallaAjuste" class="input" required>
+                            <option value="">Ajuste</option>
+                            <option value="Slim">Slim Fit</option>
+                            <option value="Regular">Regular Fit</option>
+                            <option value="Oversized">Oversized</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <input id="tallaPecho" name="tallaPecho" placeholder="Pecho (cm)" class="input" type="number" min="0">
+                    </div>
+                    <div class="col">
+                        <input id="tallaCintura" name="tallaCintura" placeholder="Cintura (cm)" class="input" type="number" min="0">
+                    </div>
+                    <div class="col">
+                        <input id="tallaCadera" name="tallaCadera" placeholder="Cadera (cm)" class="input" type="number" min="0">
+                    </div>
+                    <div class="col">
+                        <input id="tallaLargo" name="tallaLargo" placeholder="Largo (cm)" class="input" type="number" min="0">
                     </div>
                     <div class="col" style="flex: 0 0 auto;">
                         <button id="btnCrearTalla" class="btn primary" type="submit">Crear Talla</button>

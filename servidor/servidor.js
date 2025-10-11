@@ -98,17 +98,17 @@ app.post('/api/categorias', requiereRol('administrador'), async (req, res) => {
 // Tallas
 app.get('/api/tallas', requiereRol('administrador'), async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT id_talla, nombre FROM Tallas ORDER BY nombre');
+    const [rows] = await pool.query('SELECT id_talla, nombre, ajuste, pecho, cintura, cadera, largo FROM Tallas ORDER BY nombre');
     res.json({ tallas: rows });
   } catch (e) {
     res.status(500).json({ tallas: [] });
   }
 });
 app.post('/api/tallas', requiereRol('administrador'), async (req, res) => {
-  const { nombre } = req.body;
-  if (!nombre) return res.json({ ok: false });
+  const { nombre, ajuste, pecho, cintura, cadera, largo } = req.body;
+  if (!nombre || !ajuste) return res.json({ ok: false });
   try {
-    await pool.query('INSERT INTO Tallas (nombre) VALUES (?)', [nombre]);
+    await pool.query('INSERT INTO Tallas (nombre, ajuste, pecho, cintura, cadera, largo) VALUES (?, ?, ?, ?, ?, ?)', [nombre, ajuste, pecho, cintura, cadera, largo]);
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });
@@ -143,7 +143,7 @@ app.post('/api/proveedores', requiereRol('administrador'), async (req, res) => {
 });
 // Nuevo endpoint: Registro de productos completo (usado por admin.html)
 app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
-  const { marca, categoria, proveedor, nombre, precio, inventario, talla_s, talla_m, talla_l, talla_xl } = req.body;
+  const { marca, categoria, proveedor, nombre, precio, inventario, cantidades } = req.body;
   try {
     // 1. Insertar producto principal
     const [prodResult] = await pool.query(
@@ -151,18 +151,10 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
       [nombre, marca, precio, inventario, categoria, proveedor]
     );
     const id_producto = prodResult.insertId;
-    // 2. Insertar tallas (S, M, L, XL) en tabla de inventario por talla
-    const tallas = [
-      { talla: 'S', cantidad: talla_s },
-      { talla: 'M', cantidad: talla_m },
-      { talla: 'L', cantidad: talla_l },
-      { talla: 'XL', cantidad: talla_xl }
-    ];
-    for (const t of tallas) {
-      // Buscar id_talla por nombre
-      const [tallaRow] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre = ?', [t.talla]);
-      if (tallaRow.length > 0) {
-        await pool.query('INSERT INTO InventarioTallas (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, tallaRow[0].id_talla, t.cantidad]);
+    // 2. Insertar cantidades por talla en InventarioTallas
+    if (Array.isArray(cantidades)) {
+      for (const t of cantidades) {
+        await pool.query('INSERT INTO InventarioTallas (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, t.id_talla, t.cantidad]);
       }
     }
     res.json({ ok: true, id_producto });
