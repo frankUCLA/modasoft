@@ -164,8 +164,16 @@
                 
                 <!-- Placeholder para Tallas -->
                 <h3>Gestión de Tallas (S, M, L, XL)</h3>
+                <form id="form-talla" class="row form-row">
+                    <div class="col">
+                        <input id="tallaNombre" name="tallaNombre" placeholder="Nueva Talla (Ej: S, M, L, XL)" class="input" required maxlength="10">
+                    </div>
+                    <div class="col" style="flex: 0 0 auto;">
+                        <button id="btnCrearTalla" class="btn primary" type="submit">Crear Talla</button>
+                    </div>
+                </form>
                 <div id="catalogoTallas" class="list">
-                    <div class="item">Funcionalidad pendiente...</div>
+                    <div class="item">Cargando tallas...</div>
                 </div>
                 
                 <!-- Placeholder para Proveedores -->

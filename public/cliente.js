@@ -1,4 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ADMINISTRADOR: Gestión de Tallas ---
+    const formTalla = document.getElementById('form-talla');
+    const catalogoTallas = document.getElementById('catalogoTallas');
+    async function cargarTallas() {
+        try {
+            const res = await fetch('/api/tallas');
+            const data = await res.json();
+            if (catalogoTallas) {
+                catalogoTallas.innerHTML = '';
+                if (data.tallas.length === 0) {
+                    catalogoTallas.innerHTML = '<div class="item">No hay tallas registradas.</div>';
+                } else {
+                    data.tallas.forEach(talla => {
+                        const div = document.createElement('div');
+                        div.className = 'item';
+                        div.innerHTML = `${talla.nombre} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarTalla(${talla.id_talla})'>Eliminar</button>`;
+                        catalogoTallas.appendChild(div);
+                    });
+                }
+            }
+        } catch { catalogoTallas.innerHTML = '<div class="item">Error al cargar tallas.</div>'; }
+    }
+    if (formTalla) {
+        formTalla.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('tallaNombre').value.trim();
+            if (!nombre) return;
+            try {
+                const res = await fetch('/api/tallas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    formTalla.reset();
+                    cargarTallas();
+                } else {
+                    alert('Error al crear talla');
+                }
+            } catch { alert('Error de conexión'); }
+        });
+        cargarTallas();
+    }
+    window.eliminarTalla = async function(id) {
+        if (!confirm('¿Seguro que deseas eliminar esta talla?')) return;
+        try {
+            const res = await fetch(`/api/tallas/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.ok) {
+                cargarTallas();
+            } else {
+                alert('Error al eliminar talla');
+            }
+        } catch { alert('Error de conexión'); }
+    };
     // Funciones para cargar opciones en el modal de edición
     async function cargarOpcionesEdicionCategoria(selectedId) {
         const select = document.getElementById('editCategoria');

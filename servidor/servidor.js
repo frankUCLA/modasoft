@@ -95,6 +95,34 @@ app.post('/api/categorias', requiereRol('administrador'), async (req, res) => {
 });
 
 // Proveedores
+// Tallas
+app.get('/api/tallas', requiereRol('administrador'), async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT id_talla, nombre FROM Tallas ORDER BY nombre');
+    res.json({ tallas: rows });
+  } catch (e) {
+    res.status(500).json({ tallas: [] });
+  }
+});
+app.post('/api/tallas', requiereRol('administrador'), async (req, res) => {
+  const { nombre } = req.body;
+  if (!nombre) return res.json({ ok: false });
+  try {
+    await pool.query('INSERT INTO Tallas (nombre) VALUES (?)', [nombre]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+app.delete('/api/tallas/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM Tallas WHERE id_talla = ?', [id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 app.get('/api/proveedores', requiereRol('administrador'), async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT id_proveedor, nombre FROM Proveedores ORDER BY nombre');
