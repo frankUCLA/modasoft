@@ -148,7 +148,7 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
 app.get('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
   const id = req.params.id;
   try {
-    const [rows] = await pool.query('SELECT id_producto, nombre, marca, inventario, precio_venta FROM Productos WHERE id_producto = ?', [id]);
+    const [rows] = await pool.query('SELECT id_producto, nombre, marca, inventario, precio_venta, id_categoria, id_proveedor FROM Productos WHERE id_producto = ?', [id]);
     if (rows.length > 0) {
       res.json({ producto: rows[0] });
     } else {
@@ -161,9 +161,9 @@ app.get('/api/admin/productos/:id', requiereRol('administrador'), async (req, re
 // Editar producto (PUT)
 app.put('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
   const id = req.params.id;
-  const { marca, nombre, inventario, precio } = req.body;
+  const { marca, nombre, inventario, precio, id_categoria, id_proveedor } = req.body;
   try {
-    await pool.query('UPDATE Productos SET marca = ?, nombre = ?, inventario = ?, precio_venta = ? WHERE id_producto = ?', [marca, nombre, inventario, precio, id]);
+    await pool.query('UPDATE Productos SET marca = ?, nombre = ?, inventario = ?, precio_venta = ?, id_categoria = ?, id_proveedor = ? WHERE id_producto = ?', [marca, nombre, inventario, precio, id_categoria, id_proveedor, id]);
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });

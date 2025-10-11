@@ -1,15 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Funciones para cargar opciones en el modal de edición
+    async function cargarOpcionesEdicionCategoria(selectedId) {
+        const select = document.getElementById('editCategoria');
+        if (!select) return;
+        try {
+            const res = await fetch('/api/categorias');
+            const data = await res.json();
+            select.innerHTML = '';
+            data.categorias.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id_categoria;
+                opt.textContent = cat.nombre;
+                if (cat.id_categoria == selectedId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        } catch {}
+    }
+    async function cargarOpcionesEdicionProveedor(selectedId) {
+        const select = document.getElementById('editProveedor');
+        if (!select) return;
+        try {
+            const res = await fetch('/api/proveedores');
+            const data = await res.json();
+            select.innerHTML = '';
+            data.proveedores.forEach(prov => {
+                const opt = document.createElement('option');
+                opt.value = prov.id_proveedor;
+                opt.textContent = prov.nombre;
+                if (prov.id_proveedor == selectedId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        } catch {}
+    }
     // --- Modal de edición de producto ---
     const modalEditar = document.getElementById('modalEditarProducto');
     const formEditar = document.getElementById('formEditarProducto');
     const btnCerrarModal = document.getElementById('btnCerrarModal');
-    function mostrarModalEditar(prod) {
-        document.getElementById('editIdProducto').value = prod.id_producto;
-        document.getElementById('editMarca').value = prod.marca || '';
-        document.getElementById('editNombre').value = prod.nombre;
-        document.getElementById('editInventario').value = prod.inventario ?? 0;
-        document.getElementById('editPrecio').value = prod.precio_venta;
-        modalEditar.style.display = 'flex';
+    async function mostrarModalEditar(prod) {
+    document.getElementById('editIdProducto').value = prod.id_producto;
+    document.getElementById('editMarca').value = prod.marca || '';
+    document.getElementById('editNombre').value = prod.nombre;
+    document.getElementById('editInventario').value = prod.inventario ?? 0;
+    document.getElementById('editPrecio').value = prod.precio_venta;
+    await cargarOpcionesEdicionCategoria(prod.id_categoria);
+    await cargarOpcionesEdicionProveedor(prod.id_proveedor);
+    modalEditar.style.display = 'flex';
     }
     if (btnCerrarModal) {
         btnCerrarModal.onclick = () => { modalEditar.style.display = 'none'; };
@@ -22,14 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = document.getElementById('editNombre').value.trim();
             const inventario = parseInt(document.getElementById('editInventario').value);
             const precio = parseFloat(document.getElementById('editPrecio').value);
-            if (!marca || !nombre || isNaN(inventario) || isNaN(precio)) {
+            const id_categoria = document.getElementById('editCategoria').value;
+            const id_proveedor = document.getElementById('editProveedor').value;
+            if (!marca || !nombre || isNaN(inventario) || isNaN(precio) || !id_categoria || !id_proveedor) {
                 alert('Completa todos los campos.'); return;
             }
             try {
                 const res = await fetch(`/api/admin/productos/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ marca, nombre, inventario, precio })
+                    body: JSON.stringify({ marca, nombre, inventario, precio, id_categoria, id_proveedor })
                 });
                 const data = await res.json();
                 if (data.ok) {
@@ -121,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.categorias.forEach(cat => {
                     const div = document.createElement('div');
                     div.className = 'item';
-                    div.textContent = cat.nombre_categoria;
+                    div.textContent = cat.nombre;
                     catalogoCategorias.appendChild(div);
                 });
             }
