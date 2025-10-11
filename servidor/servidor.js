@@ -75,6 +75,15 @@ app.post('/api/logout', (req, res) => {
 
 // ---------------- Administrador (rutas protegidas) ----------------
 // Categorías
+app.delete('/api/categorias/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM Categorias WHERE id_categoria = ?', [id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 app.get('/api/categorias', requiereRol('administrador'), async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT id_categoria, nombre FROM Categorias ORDER BY nombre');
@@ -95,6 +104,15 @@ app.post('/api/categorias', requiereRol('administrador'), async (req, res) => {
 });
 
 // Proveedores
+app.delete('/api/proveedores/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM Proveedores WHERE id_proveedor = ?', [id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 // Tallas
 app.get('/api/tallas', requiereRol('administrador'), async (req, res) => {
   try {

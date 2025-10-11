@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.categorias.forEach(cat => {
                     const div = document.createElement('div');
                     div.className = 'item';
-                    div.textContent = cat.nombre;
+                    div.innerHTML = `${cat.nombre} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarCategoria(${cat.id_categoria})'>Eliminar</button>`;
                     catalogoCategorias.appendChild(div);
                 });
             }
@@ -293,9 +293,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.proveedores.forEach(prov => {
                     const div = document.createElement('div');
                     div.className = 'item';
-                    div.textContent = prov.nombre;
+                    div.innerHTML = `${prov.nombre} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarProveedor(${prov.id_proveedor})'>Eliminar</button>`;
                     catalogoProveedores.appendChild(div);
                 });
+    window.eliminarCategoria = async function(id) {
+        if (!confirm('¿Seguro que deseas eliminar esta categoría?')) return;
+        try {
+            const res = await fetch(`/api/categorias/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.ok) {
+                cargarCategorias();
+            } else {
+                alert('Error al eliminar categoría');
+            }
+        } catch { alert('Error de conexión'); }
+    };
+
+    window.eliminarProveedor = async function(id) {
+        if (!confirm('¿Seguro que deseas eliminar este proveedor?')) return;
+        try {
+            const res = await fetch(`/api/proveedores/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.ok) {
+                cargarProveedores();
+            } else {
+                alert('Error al eliminar proveedor');
+            }
+        } catch { alert('Error de conexión'); }
+    };
             }
             if (prodProveedor) {
                 prodProveedor.innerHTML = '<option value="">Selecciona Proveedor</option>';
