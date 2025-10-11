@@ -460,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Obtener datos del formulario
             const cliente_nombre = document.getElementById('ventaClienteNombre').value.trim();
             const cliente_cedula = document.getElementById('ventaClienteCedula').value.trim();
+            const cliente_telefono = document.getElementById('ventaClienteTelefono') ? document.getElementById('ventaClienteTelefono').value.trim() : '';
+            const cliente_email = document.getElementById('ventaClienteEmail') ? document.getElementById('ventaClienteEmail').value.trim() : '';
             const marca = document.getElementById('ventaMarca').value.trim();
             const talla = document.getElementById('ventaTalla').value;
             const cantidadVal = parseInt(document.getElementById('ventaCantidad').value);
@@ -478,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/ventas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cliente_nombre, cliente_cedula, marca, talla, cantidad: cantidadVal, precio_unitario, total_dolar, total_bs, tipo_pago })
+                    body: JSON.stringify({ cliente_nombre, cliente_cedula, cliente_telefono, cliente_email, marca, talla, cantidad: cantidadVal, precio_unitario, total_dolar, total_bs, tipo_pago })
                 });
                 const data = await res.json();
                 if (data.ok) {

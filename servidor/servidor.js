@@ -267,7 +267,7 @@ app.get('/api/clientes/buscar', requiereRol('caja'), async (req, res) => {
   const cedula = req.query.cedula;
   if (!cedula) return res.json({ cliente: null });
   try {
-    const [rows] = await pool.query('SELECT id_cliente, nombre, telefono, email FROM Clientes WHERE telefono = ? LIMIT 1', [cedula]);
+    const [rows] = await pool.query('SELECT id_cliente, nombre, cedula, telefono, email FROM Clientes WHERE cedula = ? LIMIT 1', [cedula]);
     if (rows.length > 0) {
       res.json({ cliente: rows[0] });
     } else {
@@ -283,11 +283,11 @@ app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
   try {
     // 1. Buscar o crear cliente
     let id_cliente = null;
-    const [cliRows] = await pool.query('SELECT id_cliente FROM Clientes WHERE nombre = ? AND telefono = ?', [cliente_nombre, cliente_cedula]);
+    const [cliRows] = await pool.query('SELECT id_cliente FROM Clientes WHERE cedula = ?', [cliente_cedula]);
     if (cliRows.length > 0) {
       id_cliente = cliRows[0].id_cliente;
     } else {
-      const [cliRes] = await pool.query('INSERT INTO Clientes (nombre, telefono, email) VALUES (?, ?, ?)', [cliente_nombre, cliente_cedula, cliente_telefono || '']);
+      const [cliRes] = await pool.query('INSERT INTO Clientes (nombre, cedula, telefono, email) VALUES (?, ?, ?, ?)', [cliente_nombre, cliente_cedula, cliente_telefono || '', cliente_email || '']);
       id_cliente = cliRes.insertId;
     }
     // 2. Registrar venta principal
