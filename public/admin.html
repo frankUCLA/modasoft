@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>ERP simple - Administración</title>
     <link rel="stylesheet" href="styles_admin.css">
+    <script>
+    function switchTab(tab) {
+        document.getElementById('inventarioPanel').style.display = 'none';
+        document.getElementById('catalogoPanel').style.display = 'none';
+        document.getElementById('transaccionesPanel').style.display = 'none';
+        document.getElementById('tab-inventario').classList.remove('active');
+        document.getElementById('tab-catalogo').classList.remove('active');
+        document.getElementById('tab-transacciones').classList.remove('active');
+        if (tab === 'inventario') {
+            document.getElementById('inventarioPanel').style.display = 'block';
+            document.getElementById('tab-inventario').classList.add('active');
+        }
+        if (tab === 'catalogo') {
+            document.getElementById('catalogoPanel').style.display = 'block';
+            document.getElementById('tab-catalogo').classList.add('active');
+        }
+        if (tab === 'transacciones') {
+            document.getElementById('transaccionesPanel').style.display = 'block';
+            document.getElementById('tab-transacciones').classList.add('active');
+        }
+    }
+    window.onload = function() {
+        switchTab('inventario');
+    };
+    </script>
 </head>
 <body>
     <div id="app" class="container">
@@ -31,7 +56,7 @@
             </nav>
             
             <!-- 1. GESTIÓN DE INVENTARIO Y PRODUCTOS -->
-            <div id="inventarioPanel" class="panel tabContent">
+            <div id="inventarioPanel" class="panel tabContent" style="display:block;">
                 <h3>Gestión de Productos</h3>
                 <div class="row header-row">
                                         <h4>Crear Producto</h4>
