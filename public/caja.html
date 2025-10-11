@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ERP simple - Caja</title>
-  <link rel="stylesheet" href="styles_caja.css">
+  <link rel="stylesheet" href="style_caja.css">
 </head>
 <body>
   <div id="app" class="container">
@@ -38,14 +38,13 @@
             </div>
             <div class="row form-row">
               <div class="col">
-                <input id="ventaMarca" placeholder="Marca de la Ropa" class="input" required>
+                <select id="ventaProducto" class="input" required>
+                  <option value="">Selecciona producto</option>
+                </select>
               </div>
               <div class="col">
                 <select id="ventaTalla" class="input" required>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
+                  <option value="">Selecciona talla</option>
                 </select>
               </div>
               <div class="col">
@@ -62,22 +61,27 @@
               <div class="col">
                 <input id="ventaTotalBs" placeholder="Total (Bs)" type="text" class="input" readonly>
               </div>
+              <div class="col">
+                <button id="btnAgregarProducto" class="btn secondary" type="button">Agregar al carrito</button>
+              </div>
             </div>
             <div class="row form-row">
               <div class="col">
                 <select id="ventaTipoPago" class="input" required>
                   <option value="Pago Móvil">Pago Móvil</option>
-                  <option value="Efectivo Dólares">Efectivo Dólares</option>
-                  <option value="Punto">Punto</option>
+                  <option value="Efectivo Bolívares">Efectivo Bolívares</option>
+                  <option value="Transferencia">Transferencia</option>
+                  <option value="Dólares en efectivo">Dólares en efectivo</option>
+                  <option value="Punto de venta">Punto de venta</option>
                 </select>
               </div>
               <div class="col">
-                <button id="btnNuevaVenta" class="btn primary" type="submit">Registrar venta</button>
+                <button id="btnPagarVenta" class="btn primary" type="button">Pagar venta</button>
               </div>
             </div>
           </form>
         <div id="ventaDetalle" class="list">
-           <div class="item">Ventas registradas aparecerán aquí.</div>
+           <div class="item">Carrito vacío. Agrega productos para la venta.</div>
         </div>
       </div>
     </main>
