@@ -33,6 +33,23 @@
 </head>
 <body>
     <div id="app" class="container">
+        <!-- Modal de edición de producto -->
+        <div id="modalEditarProducto" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:30px;border-radius:8px;max-width:400px;margin:auto;position:relative;">
+                <h3>Editar Producto</h3>
+                <form id="formEditarProducto">
+                    <input type="hidden" id="editIdProducto">
+                    <label>Marca:<input type="text" id="editMarca" class="input" required></label><br>
+                    <label>Nombre:<input type="text" id="editNombre" class="input" required></label><br>
+                    <label>Cantidad:<input type="number" id="editInventario" class="input" min="0" required></label><br>
+                    <label>Precio ($):<input type="number" id="editPrecio" class="input" step="0.01" required></label><br>
+                    <div style="margin-top:10px;text-align:right;">
+                        <button type="submit" class="btn primary">Guardar</button>
+                        <button type="button" class="btn" id="btnCerrarModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <header class="header">
             <h1>ERP simple - Panel de Administración</h1>
             <div id="statusDisplay" class="status-msg">Conectado</div>

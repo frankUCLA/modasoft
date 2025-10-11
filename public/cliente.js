@@ -1,4 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Modal de edición de producto ---
+    const modalEditar = document.getElementById('modalEditarProducto');
+    const formEditar = document.getElementById('formEditarProducto');
+    const btnCerrarModal = document.getElementById('btnCerrarModal');
+    function mostrarModalEditar(prod) {
+        document.getElementById('editIdProducto').value = prod.id_producto;
+        document.getElementById('editMarca').value = prod.marca || '';
+        document.getElementById('editNombre').value = prod.nombre;
+        document.getElementById('editInventario').value = prod.inventario ?? 0;
+        document.getElementById('editPrecio').value = prod.precio_venta;
+        modalEditar.style.display = 'flex';
+    }
+    if (btnCerrarModal) {
+        btnCerrarModal.onclick = () => { modalEditar.style.display = 'none'; };
+    }
+    if (formEditar) {
+        formEditar.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editIdProducto').value;
+            const marca = document.getElementById('editMarca').value.trim();
+            const nombre = document.getElementById('editNombre').value.trim();
+            const inventario = parseInt(document.getElementById('editInventario').value);
+            const precio = parseFloat(document.getElementById('editPrecio').value);
+            if (!marca || !nombre || isNaN(inventario) || isNaN(precio)) {
+                alert('Completa todos los campos.'); return;
+            }
+            try {
+                const res = await fetch(`/api/admin/productos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ marca, nombre, inventario, precio })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    modalEditar.style.display = 'none';
+                    cargarProductos();
+                } else {
+                    alert('Error al editar producto');
+                }
+            } catch { alert('Error de conexión'); }
+        };
+    }
+    window.editarProducto = async function(id) {
+        try {
+            const res = await fetch(`/api/admin/productos/${id}`);
+            const data = await res.json();
+            if (data.producto) {
+                mostrarModalEditar(data.producto);
+            } else {
+                alert('No se encontró el producto');
+            }
+        } catch { alert('Error al cargar producto'); }
+    };
     // --- ADMINISTRADOR: Listado, edición y eliminación de productos ---
     const adminProductos = document.getElementById('adminProductos');
     async function cargarProductos() {
@@ -10,12 +63,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.productos.length === 0) {
                     adminProductos.innerHTML = '<div class="item">No hay productos registrados.</div>';
                 } else {
+                    // Crear tabla bonita
+                    let tabla = `<table class='tabla-productos' style='width:100%;border-collapse:collapse;'>
+                        <thead>
+                            <tr style='background:#e0e7ef;'>
+                                <th>Marca</th>
+                                <th>Nombre</th>
+                                <th>Cantidad</th>
+                                <th>Precio ($)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
                     data.productos.forEach(prod => {
-                        const div = document.createElement('div');
-                        div.className = 'item';
-                        div.innerHTML = `<b>${prod.nombre}</b> | Marca: ${prod.marca || ''} | Precio: $${prod.precio_venta} <button class='btn' onclick='editarProducto(${prod.id_producto})'>Editar</button> <button class='btn danger' onclick='eliminarProducto(${prod.id_producto})'>Eliminar</button>`;
-                        adminProductos.appendChild(div);
+                        tabla += `<tr style='border-bottom:1px solid #ccc;'>
+                            <td>${prod.marca || ''}</td>
+                            <td>${prod.nombre}</td>
+                            <td>${prod.inventario ?? ''}</td>
+                            <td>${prod.precio_venta}</td>
+                            <td>
+                                <button class='btn' style='background:#3b82f6;color:#fff;margin-right:5px;' onclick='editarProducto(${prod.id_producto})'>Editar</button>
+                                <button class='btn danger' style='background:#ef4444;color:#fff;' onclick='eliminarProducto(${prod.id_producto})'>Eliminar</button>
+                            </td>
+                        </tr>`;
                     });
+                    tabla += '</tbody></table>';
+                    adminProductos.innerHTML = tabla;
                 }
             }
         } catch { adminProductos.innerHTML = '<div class="item">Error al cargar productos.</div>'; }

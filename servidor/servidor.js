@@ -144,6 +144,31 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
   }
 });
 // Listar productos (GET)
+// Obtener producto por ID (GET)
+app.get('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [rows] = await pool.query('SELECT id_producto, nombre, marca, inventario, precio_venta FROM Productos WHERE id_producto = ?', [id]);
+    if (rows.length > 0) {
+      res.json({ producto: rows[0] });
+    } else {
+      res.json({ producto: null });
+    }
+  } catch (e) {
+    res.json({ producto: null });
+  }
+});
+// Editar producto (PUT)
+app.put('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
+  const id = req.params.id;
+  const { marca, nombre, inventario, precio } = req.body;
+  try {
+    await pool.query('UPDATE Productos SET marca = ?, nombre = ?, inventario = ?, precio_venta = ? WHERE id_producto = ?', [marca, nombre, inventario, precio, id]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 // Eliminar producto (DELETE)
 app.delete('/api/admin/productos/:id', requiereRol('administrador'), async (req, res) => {
   const id = req.params.id;
@@ -157,7 +182,7 @@ app.delete('/api/admin/productos/:id', requiereRol('administrador'), async (req,
 app.get('/api/admin/productos', requiereRol('administrador'), async (req, res) => {
   const { q } = req.query;
   try {
-    let query = 'SELECT id_producto, nombre, precio_venta, descripcion FROM Productos';
+    let query = 'SELECT id_producto, nombre, marca, inventario, precio_venta FROM Productos';
     let params = [];
     if (q) {
       query += ' WHERE nombre LIKE ?';
