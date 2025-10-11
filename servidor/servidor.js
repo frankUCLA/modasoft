@@ -77,7 +77,7 @@ app.post('/api/logout', (req, res) => {
 // Categorías
 app.get('/api/categorias', requiereRol('administrador'), async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT id_categoria, nombre_categoria FROM Categorias ORDER BY nombre_categoria');
+    const [rows] = await pool.query('SELECT id_categoria, nombre FROM Categorias ORDER BY nombre');
     res.json({ categorias: rows });
   } catch (e) {
     res.status(500).json({ categorias: [] });
@@ -87,7 +87,7 @@ app.post('/api/categorias', requiereRol('administrador'), async (req, res) => {
   const { nombre } = req.body;
   if (!nombre) return res.json({ ok: false });
   try {
-    await pool.query('INSERT INTO Categorias (nombre_categoria) VALUES (?)', [nombre]);
+    await pool.query('INSERT INTO Categorias (nombre) VALUES (?)', [nombre]);
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });
