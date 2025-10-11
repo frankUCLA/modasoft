@@ -18,10 +18,18 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 
-    $stmt = $pdo->query("SELECT id_producto, nombre, descripcion, precio_venta FROM Productos LIMIT 50");
-    $rows = $stmt->fetchAll();
+    // Permite seleccionar la tabla a consultar
+    $tabla = isset($_GET['tabla']) ? $_GET['tabla'] : 'productos';
 
-    echo json_encode(["ok" => true, "rows" => $rows]);
+    if ($tabla === 'tallas') {
+        $stmt = $pdo->query("SELECT id_talla, nombre FROM Tallas ORDER BY id_talla DESC");
+        $rows = $stmt->fetchAll();
+        echo json_encode(["ok" => true, "tallas" => $rows]);
+    } else {
+        $stmt = $pdo->query("SELECT id_producto, nombre, descripcion, precio_venta FROM Productos LIMIT 50");
+        $rows = $stmt->fetchAll();
+        echo json_encode(["ok" => true, "rows" => $rows]);
+    }
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["ok" => false, "error" => $e->getMessage()]);

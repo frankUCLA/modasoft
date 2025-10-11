@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function mostrarTallasDinamicas() {
         if (!tallasDinamicasDiv) return;
         try {
-            const res = await fetch('/api/tallas');
+            const res = await fetch('/api/datos.php?tabla=tallas');
             const data = await res.json();
             tallasDinamicasDiv.innerHTML = '';
             data.tallas.forEach(talla => {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const catalogoTallas = document.getElementById('catalogoTallas');
     async function cargarTallas() {
         try {
-            const res = await fetch('/api/tallas');
+            const res = await fetch('/api/datos.php?tabla=tallas');
             const data = await res.json();
             if (catalogoTallas) {
                 catalogoTallas.innerHTML = '';
