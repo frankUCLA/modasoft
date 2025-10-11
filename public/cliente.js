@@ -1,4 +1,107 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ADMINISTRADOR: Registro de Categorías ---
+    const formCategoria = document.getElementById('form-categoria');
+    const catalogoCategorias = document.getElementById('catalogoCategorias');
+    const prodCategoria = document.getElementById('prodCategoria');
+    async function cargarCategorias() {
+        try {
+            const res = await fetch('/api/categorias');
+            const data = await res.json();
+            if (catalogoCategorias) {
+                catalogoCategorias.innerHTML = '';
+                data.categorias.forEach(cat => {
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.textContent = cat.nombre_categoria;
+                    catalogoCategorias.appendChild(div);
+                });
+            }
+            if (prodCategoria) {
+                prodCategoria.innerHTML = '<option value="">Selecciona Categoría</option>';
+                data.categorias.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id_categoria;
+                    opt.textContent = cat.nombre_categoria;
+                    prodCategoria.appendChild(opt);
+                });
+            }
+        } catch {}
+    }
+    if (formCategoria) {
+        formCategoria.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('catNombre').value.trim();
+            if (!nombre) return;
+            try {
+                const res = await fetch('/api/categorias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    formCategoria.reset();
+                    cargarCategorias();
+                } else {
+                    alert('Error al crear categoría');
+                }
+            } catch { alert('Error de conexión'); }
+        });
+        cargarCategorias();
+    }
+
+    // --- ADMINISTRADOR: Registro de Proveedores ---
+    const formProveedor = document.getElementById('form-proveedor');
+    const catalogoProveedores = document.getElementById('catalogoProveedores');
+    const prodProveedor = document.getElementById('prodProveedor');
+    async function cargarProveedores() {
+        try {
+            const res = await fetch('/api/proveedores');
+            const data = await res.json();
+            if (catalogoProveedores) {
+                catalogoProveedores.innerHTML = '';
+                data.proveedores.forEach(prov => {
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.textContent = prov.nombre;
+                    catalogoProveedores.appendChild(div);
+                });
+            }
+            if (prodProveedor) {
+                prodProveedor.innerHTML = '<option value="">Selecciona Proveedor</option>';
+                data.proveedores.forEach(prov => {
+                    const opt = document.createElement('option');
+                    opt.value = prov.id_proveedor;
+                    opt.textContent = prov.nombre;
+                    prodProveedor.appendChild(opt);
+                });
+            }
+        } catch {}
+    }
+    if (formProveedor) {
+        formProveedor.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('provNombre').value.trim();
+            const contacto = document.getElementById('provContacto').value.trim();
+            const telefono = document.getElementById('provTelefono').value.trim();
+            if (!nombre) return;
+            try {
+                const res = await fetch('/api/proveedores', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, contacto, telefono })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    formProveedor.reset();
+                    cargarProveedores();
+                } else {
+                    alert('Error al crear proveedor');
+                }
+            } catch { alert('Error de conexión'); }
+        });
+        cargarProveedores();
+    }
     // --- ADMINISTRADOR: Registro de Productos ---
     const formProductoAdmin = document.getElementById('form-producto-admin');
     if (formProductoAdmin) {

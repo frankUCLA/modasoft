@@ -74,6 +74,45 @@ app.post('/api/logout', (req, res) => {
 });
 
 // ---------------- Administrador (rutas protegidas) ----------------
+// Categorías
+app.get('/api/categorias', requiereRol('administrador'), async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT id_categoria, nombre_categoria FROM Categorias ORDER BY nombre_categoria');
+    res.json({ categorias: rows });
+  } catch (e) {
+    res.status(500).json({ categorias: [] });
+  }
+});
+app.post('/api/categorias', requiereRol('administrador'), async (req, res) => {
+  const { nombre } = req.body;
+  if (!nombre) return res.json({ ok: false });
+  try {
+    await pool.query('INSERT INTO Categorias (nombre_categoria) VALUES (?)', [nombre]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
+// Proveedores
+app.get('/api/proveedores', requiereRol('administrador'), async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT id_proveedor, nombre FROM Proveedores ORDER BY nombre');
+    res.json({ proveedores: rows });
+  } catch (e) {
+    res.status(500).json({ proveedores: [] });
+  }
+});
+app.post('/api/proveedores', requiereRol('administrador'), async (req, res) => {
+  const { nombre, contacto, telefono } = req.body;
+  if (!nombre) return res.json({ ok: false });
+  try {
+    await pool.query('INSERT INTO Proveedores (nombre, contacto, telefono) VALUES (?, ?, ?)', [nombre, contacto, telefono]);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
 // Nuevo endpoint: Registro de productos completo (usado por admin.html)
 app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
   const { marca, categoria, proveedor, nombre, precio, inventario, talla_s, talla_m, talla_l, talla_xl } = req.body;

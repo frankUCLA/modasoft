@@ -102,14 +102,14 @@
                 
                 <!-- Gestión de Categorías (Ejemplo de CRUD simple) -->
                 <h3>Gestión de Categorías</h3>
-                <div class="row form-row">
+                <form id="form-categoria" class="row form-row">
                     <div class="col">
-                        <input id="catNombre" placeholder="Nueva Categoría (Ej: Camisetas)" class="input">
+                        <input id="catNombre" name="catNombre" placeholder="Nueva Categoría (Ej: Camisetas)" class="input" required>
                     </div>
                     <div class="col" style="flex: 0 0 auto;">
-                        <button id="btnCrearCat" class="btn primary">Crear Categoría</button>
+                        <button id="btnCrearCat" class="btn primary" type="submit">Crear Categoría</button>
                     </div>
-                </div>
+                </form>
                 <div id="catalogoCategorias" class="list">
                     <div class="item">Cargando categorías...</div>
                 </div>
@@ -122,8 +122,22 @@
                 
                 <!-- Placeholder para Proveedores -->
                 <h3>Gestión de Proveedores</h3>
+                <form id="form-proveedor" class="row form-row">
+                    <div class="col">
+                        <input id="provNombre" name="provNombre" placeholder="Nombre del Proveedor" class="input" required>
+                    </div>
+                    <div class="col">
+                        <input id="provContacto" name="provContacto" placeholder="Contacto" class="input">
+                    </div>
+                    <div class="col">
+                        <input id="provTelefono" name="provTelefono" placeholder="Teléfono" class="input">
+                    </div>
+                    <div class="col" style="flex: 0 0 auto;">
+                        <button id="btnCrearProv" class="btn primary" type="submit">Crear Proveedor</button>
+                    </div>
+                </form>
                 <div id="catalogoProveedores" class="list">
-                    <div class="item">Funcionalidad pendiente...</div>
+                    <div class="item">Cargando proveedores...</div>
                 </div>
             </div>
 
