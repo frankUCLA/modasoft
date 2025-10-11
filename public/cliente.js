@@ -227,8 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch { alert('Error de conexión'); }
     };
-    // Cargar productos al iniciar
-    cargarProductos();
     // --- ADMINISTRADOR: Registro de Categorías ---
     const formCategoria = document.getElementById('form-categoria');
     const catalogoCategorias = document.getElementById('catalogoCategorias');
@@ -296,31 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     div.innerHTML = `${prov.nombre} <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarProveedor(${prov.id_proveedor})'>Eliminar</button>`;
                     catalogoProveedores.appendChild(div);
                 });
-    window.eliminarCategoria = async function(id) {
-        if (!confirm('¿Seguro que deseas eliminar esta categoría?')) return;
-        try {
-            const res = await fetch(`/api/categorias/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (data.ok) {
-                cargarCategorias();
-            } else {
-                alert('Error al eliminar categoría');
-            }
-        } catch { alert('Error de conexión'); }
-    };
-
-    window.eliminarProveedor = async function(id) {
-        if (!confirm('¿Seguro que deseas eliminar este proveedor?')) return;
-        try {
-            const res = await fetch(`/api/proveedores/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (data.ok) {
-                cargarProveedores();
-            } else {
-                alert('Error al eliminar proveedor');
-            }
-        } catch { alert('Error de conexión'); }
-    };
             }
             if (prodProveedor) {
                 prodProveedor.innerHTML = '<option value="">Selecciona Proveedor</option>';
@@ -406,96 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CAJA: Registro de Ventas ---
-    const formVentaCaja = document.getElementById('form-venta-caja');
-    if (formVentaCaja) {
-        // Autocompletar datos del cliente al ingresar la cédula
-        const inputCedula = document.getElementById('ventaClienteCedula');
-        const inputNombre = document.getElementById('ventaClienteNombre');
-        const inputTelefono = document.getElementById('ventaClienteTelefono');
-        const inputEmail = document.getElementById('ventaClienteEmail');
-
-        inputCedula.addEventListener('blur', async () => {
-            const cedula = inputCedula.value.trim();
-            if (!cedula) return;
-            try {
-                const res = await fetch(`/api/clientes/buscar?cedula=${encodeURIComponent(cedula)}`);
-                const data = await res.json();
-                if (data.cliente) {
-                    inputNombre.value = data.cliente.nombre;
-                    // En la tabla, telefono es la cedula y email es el telefono
-                    if (inputTelefono) inputTelefono.value = data.cliente.telefono || '';
-                    if (inputEmail) inputEmail.value = data.cliente.email || '';
-                } else {
-                    inputNombre.value = '';
-                    if (inputTelefono) inputTelefono.value = '';
-                    if (inputEmail) inputEmail.value = '';
-                }
-            } catch {}
-        });
-        // Actualizar totales automáticamente
-        const precioUnitario = document.getElementById('ventaPrecioUnitario');
-        const cantidad = document.getElementById('ventaCantidad');
-        const totalDolar = document.getElementById('ventaTotalDolar');
-        const totalBs = document.getElementById('ventaTotalBs');
-
-        async function actualizarTotales() {
-            const precio = parseFloat(precioUnitario.value) || 0;
-            const cant = parseInt(cantidad.value) || 0;
-            const total = precio * cant;
-            totalDolar.value = total.toFixed(2);
-            // Obtener tasa BCV
-            let tasa = 36; // Valor fijo de ejemplo, deberías obtenerlo de una API real
-            try {
-                const res = await fetch('/api/tasa-bcv');
-                const data = await res.json();
-                if (data.tasa) tasa = parseFloat(data.tasa);
-            } catch {}
-            totalBs.value = (total * tasa).toFixed(2);
-        }
-        precioUnitario.addEventListener('input', actualizarTotales);
-        cantidad.addEventListener('input', actualizarTotales);
-
-        formVentaCaja.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            // Obtener datos del formulario
-            const cliente_nombre = document.getElementById('ventaClienteNombre').value.trim();
-            const cliente_cedula = document.getElementById('ventaClienteCedula').value.trim();
-            const cliente_telefono = document.getElementById('ventaClienteTelefono') ? document.getElementById('ventaClienteTelefono').value.trim() : '';
-            const cliente_email = document.getElementById('ventaClienteEmail') ? document.getElementById('ventaClienteEmail').value.trim() : '';
-            const marca = document.getElementById('ventaMarca').value.trim();
-            const talla = document.getElementById('ventaTalla').value;
-            const cantidadVal = parseInt(document.getElementById('ventaCantidad').value);
-            const precio_unitario = parseFloat(document.getElementById('ventaPrecioUnitario').value);
-            const total_dolar = parseFloat(document.getElementById('ventaTotalDolar').value);
-            const total_bs = parseFloat(document.getElementById('ventaTotalBs').value);
-            const tipo_pago = document.getElementById('ventaTipoPago').value;
-
-            if (!cliente_nombre || !cliente_cedula || !marca || !talla || isNaN(cantidadVal) || isNaN(precio_unitario)) {
-                alert('Completa todos los campos obligatorios.');
-                return;
-            }
-
-            // Enviar al backend
-            try {
-                const res = await fetch('/api/ventas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cliente_nombre, cliente_cedula, cliente_telefono, cliente_email, marca, talla, cantidad: cantidadVal, precio_unitario, total_dolar, total_bs, tipo_pago })
-                });
-                const data = await res.json();
-                if (data.ok) {
-                    alert('Venta registrada correctamente.');
-                    formVentaCaja.reset();
-                    totalDolar.value = '';
-                    totalBs.value = '';
-                } else {
-                    alert('Error al registrar venta: ' + (data.error || ''));
-                }
-            } catch (err) {
-                alert('Error de conexión al guardar venta.');
-            }
-        });
-    }
+    // ...el bloque de lógica de ventas tipo carrito ya maneja la referencia única de formVentaCaja...
     // 1. Elementos del DOM
     const loginSection = document.getElementById('loginSection');
     const loginBtn = document.getElementById('loginBtn');
@@ -678,4 +562,198 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
     }
+    
+    // --- CAJA: Registro de Ventas ---
+    const formVentaCaja = document.getElementById('form-venta-caja');
+    if (formVentaCaja) {
+        // Autocompletar datos del cliente al ingresar la cédula
+        const inputCedula = document.getElementById('ventaClienteCedula');
+        const inputNombre = document.getElementById('ventaClienteNombre');
+        const inputTelefono = document.getElementById('ventaClienteTelefono');
+        const inputEmail = document.getElementById('ventaClienteEmail');
+
+        inputCedula.addEventListener('blur', async () => {
+            const cedula = inputCedula.value.trim();
+            if (!cedula) return;
+            try {
+                const res = await fetch(`/api/clientes/buscar?cedula=${encodeURIComponent(cedula)}`);
+                const data = await res.json();
+                if (data.cliente) {
+                    inputNombre.value = data.cliente.nombre;
+                    // En la tabla, telefono es la cedula y email es el telefono
+                    if (inputTelefono) inputTelefono.value = data.cliente.telefono || '';
+                    if (inputEmail) inputEmail.value = data.cliente.email || '';
+                } else {
+                    inputNombre.value = '';
+                    if (inputTelefono) inputTelefono.value = '';
+                    if (inputEmail) inputEmail.value = '';
+                }
+            } catch {}
+        });
+        // Actualizar totales automáticamente
+        const precioUnitario = document.getElementById('ventaPrecioUnitario');
+        const cantidad = document.getElementById('ventaCantidad');
+        const totalDolar = document.getElementById('ventaTotalDolar');
+        const totalBs = document.getElementById('ventaTotalBs');
+
+        async function actualizarTotales() {
+            const precio = parseFloat(precioUnitario.value) || 0;
+            const cant = parseInt(cantidad.value) || 0;
+            const total = precio * cant;
+            totalDolar.value = total.toFixed(2);
+            // Obtener tasa BCV
+            let tasa = 36; // Valor fijo de ejemplo, deberías obtenerlo de una API real
+            try {
+                const res = await fetch('/api/tasa-bcv');
+                const data = await res.json();
+                if (data.tasa) tasa = parseFloat(data.tasa);
+            } catch {}
+            totalBs.value = (total * tasa).toFixed(2);
+        }
+        precioUnitario.addEventListener('input', actualizarTotales);
+        cantidad.addEventListener('input', actualizarTotales);
+
+        // --- CAJA: Manejo de Productos en Venta ---
+    const selectProducto = document.getElementById('ventaProducto');
+    const selectTalla = document.getElementById('ventaTalla');
+    const inputCantidad = document.getElementById('ventaCantidad');
+    const inputPrecioUnitario = document.getElementById('ventaPrecioUnitario');
+    const inputTotalDolar = document.getElementById('ventaTotalDolar');
+    const inputTotalBs = document.getElementById('ventaTotalBs');
+    const btnAgregarProducto = document.getElementById('btnAgregarProducto');
+    const ventaDetalle = document.getElementById('ventaDetalle');
+    const btnPagarVenta = document.getElementById('btnPagarVenta');
+    let carrito = [];
+
+    // Cargar productos disponibles en el select
+    async function cargarProductosCaja() {
+        try {
+            const res = await fetch('/api/admin/productos');
+            const data = await res.json();
+            productosDisponibles = data.productos || [];
+            selectProducto.innerHTML = '<option value="">Selecciona producto</option>';
+            productosDisponibles.forEach(prod => {
+                selectProducto.innerHTML += `<option value="${prod.id_producto}" data-precio="${prod.precio_venta}" data-nombre="${prod.nombre}" data-marca="${prod.marca}">${prod.marca} - ${prod.nombre}</option>`;
+            });
+        } catch {}
+    }
+    cargarProductosCaja();
+
+    // Al cambiar el producto, actualizar el precio unitario
+    selectProducto.addEventListener('change', () => {
+        const option = selectProducto.selectedOptions[0];
+        if (option) {
+            const precio = option.getAttribute('data-precio');
+            inputPrecioUnitario.value = precio;
+            // Actualizar tallas disponibles según el producto
+            const idProd = option.value;
+            cargarTallasPorProducto(idProd);
+        } else {
+            inputPrecioUnitario.value = '';
+            selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+        }
+    });
+
+    // Cargar tallas disponibles para el producto seleccionado
+    async function cargarTallasPorProducto(idProducto) {
+        const res = await fetch(`/api/productos/${idProducto}`);
+        const data = await res.json();
+        const tallas = data.producto ? data.producto.tallas : [];
+        selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+        tallas.forEach(talla => {
+            selectTalla.innerHTML += `<option value="${talla.id_talla}" data-cantidad="${talla.cantidad}">${talla.nombre} (${talla.cantidad} disponibles)</option>`;
+        });
+    }
+
+    btnAgregarProducto.addEventListener('click', () => {
+        const idProd = selectProducto.value;
+        const idTalla = selectTalla.value;
+        const optTalla = selectTalla.selectedOptions[0];
+        const optProd = selectProducto.selectedOptions[0];
+        const nombreProd = optProd ? optProd.getAttribute('data-nombre') : '';
+        const marcaProd = optProd ? optProd.getAttribute('data-marca') : '';
+        const nombreTalla = optTalla ? optTalla.textContent : '';
+        const cantidad = parseInt(inputCantidad.value) || 0;
+        const maxCant = optTalla ? parseInt(optTalla.getAttribute('data-cantidad')) : 0;
+        const precio = parseFloat(inputPrecioUnitario.value) || 0;
+        if (!idProd || !idTalla || cantidad < 1 || cantidad > maxCant) {
+            alert('Completa todos los campos y verifica la cantidad.');
+            return;
+        }
+        carrito.push({ idProd, nombreProd, marcaProd, idTalla, nombreTalla, cantidad, precio });
+        renderCarrito();
+        // Limpiar campos
+        selectProducto.value = '';
+        selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+        inputCantidad.value = '';
+        inputPrecioUnitario.value = '';
+        inputTotalDolar.value = '';
+        inputTotalBs.value = '';
+    });
+
+    function renderCarrito() {
+        ventaDetalle.innerHTML = '';
+        if (carrito.length === 0) {
+            ventaDetalle.innerHTML = '<div class="item">Carrito vacío. Agrega productos para la venta.</div>';
+            return;
+        }
+        carrito.forEach((item, idx) => {
+            ventaDetalle.innerHTML += `<div class="item">${item.marcaProd} - ${item.nombreProd} - ${item.nombreTalla} x${item.cantidad} ($${item.precio}) <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarDelCarrito(${idx})'>Eliminar</button></div>`;
+        });
+    }
+
+    window.eliminarDelCarrito = function(index) {
+        carrito.splice(index, 1);
+        renderCarrito();
+    };
+
+    btnPagarVenta.addEventListener('click', async () => {
+        // Obtener datos del cliente
+        const cliente_nombre = document.getElementById('ventaClienteNombre').value.trim();
+        const cliente_cedula = document.getElementById('ventaClienteCedula').value.trim();
+        const cliente_telefono = document.getElementById('ventaClienteTelefono') ? document.getElementById('ventaClienteTelefono').value.trim() : '';
+        const cliente_email = document.getElementById('ventaClienteEmail') ? document.getElementById('ventaClienteEmail').value.trim() : '';
+        const tipo_pago = selectTipoPago.value;
+        if (!cliente_nombre || !cliente_cedula || carrito.length === 0 || !tipo_pago) {
+            alert('Completa todos los campos y agrega productos al carrito.');
+            return;
+        }
+        // Enviar cada producto como venta
+        let ok = true;
+        for (const item of carrito) {
+            const body = {
+                cliente_nombre,
+                cliente_cedula,
+                cliente_telefono,
+                cliente_email,
+                marca: item.marcaProd,
+                nombre: item.nombreProd,
+                talla: item.nombreTalla.split(' ')[0],
+                cantidad: item.cantidad,
+                precio_unitario: item.precio,
+                total_dolar: (item.precio * item.cantidad).toFixed(2),
+                total_bs: '', // Se puede calcular en backend
+                tipo_pago
+            };
+            try {
+                const res = await fetch('/api/ventas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!data.ok) ok = false;
+            } catch { ok = false; }
+        }
+        if (ok) {
+            alert('Venta registrada correctamente.');
+            carrito = [];
+            renderCarrito();
+            formVentaCaja.reset();
+            inputTotalDolar.value = '';
+            inputTotalBs.value = '';
+        } else {
+            alert('Error al registrar venta.');
+        }
+    });
 });
