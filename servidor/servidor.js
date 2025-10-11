@@ -210,6 +210,15 @@ app.get('/api/admin/productos', requiereRol('administrador'), async (req, res) =
     }
     query += ' LIMIT 100';
     const [rows] = await pool.query(query, params);
+
+    // Obtener cantidades por talla para cada producto
+    for (const prod of rows) {
+      const [tallas] = await pool.query(
+        'SELECT Tallas.nombre AS talla, Inventario.cantidad FROM Inventario JOIN Tallas ON Inventario.id_talla = Tallas.id_talla WHERE Inventario.id_producto = ?',
+        [prod.id_producto]
+      );
+      prod.tallas = tallas.map(t => `${t.talla}=${t.cantidad}`).join(' ');
+    }
     res.json({ productos: rows });
   } catch (e) {
     console.error(e);

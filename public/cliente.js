@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         tabla += `<tr style='border-bottom:1px solid #ccc;'>
                             <td>${prod.marca || ''}</td>
                             <td>${prod.nombre}</td>
-                            <td>${prod.inventario ?? ''}</td>
+                            <td>${prod.tallas || ''}</td>
                             <td>${prod.precio_venta}</td>
                             <td>
                                 <button class='btn' style='background:#3b82f6;color:#fff;margin-right:5px;' onclick='editarProducto(${prod.id_producto})'>Editar</button>
