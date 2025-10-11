@@ -132,7 +132,7 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
     ];
     for (const t of tallas) {
       // Buscar id_talla por nombre
-      const [tallaRow] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre_talla = ?', [t.talla]);
+      const [tallaRow] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre = ?', [t.talla]);
       if (tallaRow.length > 0) {
         await pool.query('INSERT INTO InventarioTallas (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, tallaRow[0].id_talla, t.cantidad]);
       }
