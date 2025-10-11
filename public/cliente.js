@@ -49,12 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const largo = parseInt(document.getElementById('tallaLargo').value) || null;
             if (!nombre || !ajuste) return;
             try {
-                const nombre = document.getElementById('tallaNombre').value.trim();
-                const ajuste = document.getElementById('tallaAjuste').value;
-                const pecho = parseInt(document.getElementById('tallaPecho').value) || null;
-                const cintura = parseInt(document.getElementById('tallaCintura').value) || null;
-                const cadera = parseInt(document.getElementById('tallaCadera').value) || null;
-                const largo = parseInt(document.getElementById('tallaLargo').value) || null;
                 const res = await fetch('/api/tallas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -249,7 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.categorias.forEach(cat => {
                     const opt = document.createElement('option');
                     opt.value = cat.id_categoria;
-                    opt.textContent = cat.nombre_categoria;
+                    // CORRECCIÓN: Usar cat.nombre consistentemente
+                    opt.textContent = cat.nombre; 
                     prodCategoria.appendChild(opt);
                 });
             }
@@ -379,17 +374,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CAJA: Registro de Ventas ---
-    // ...el bloque de lógica de ventas tipo carrito ya maneja la referencia única de formVentaCaja...
-    // 1. Elementos del DOM
+    
+    // 1. Elementos del DOM y variables de estado para CAJA
     const loginSection = document.getElementById('loginSection');
     const loginBtn = document.getElementById('loginBtn');
     const usuarioEl = document.getElementById('usuario');
     const passwordEl = document.getElementById('password');
     const loginMsg = document.getElementById('loginMsg');
     const statusDisplay = document.getElementById('statusDisplay');
-    // Elemento genérico para cerrar sesión (espera ser usado en otros HTML)
     const logoutBtn = document.getElementById('logoutBtn'); 
     
+    // Elementos del formulario de Venta
+    const formVentaCaja = document.getElementById('form-venta-caja');
+    const inputCedula = document.getElementById('ventaClienteCedula');
+    const inputNombre = document.getElementById('ventaClienteNombre');
+    const inputTelefono = document.getElementById('ventaClienteTelefono');
+    const inputEmail = document.getElementById('ventaClienteEmail');
+    const selectProducto = document.getElementById('ventaProducto');
+    const selectTalla = document.getElementById('ventaTalla');
+    const inputCantidad = document.getElementById('ventaCantidad');
+    const inputPrecioUnitario = document.getElementById('ventaPrecioUnitario');
+    const inputTotalDolar = document.getElementById('ventaTotalDolar');
+    const inputTotalBs = document.getElementById('ventaTotalBs');
+    const btnAgregarProducto = document.getElementById('btnAgregarProducto');
+    const ventaDetalle = document.getElementById('ventaDetalle');
+    const btnPagarVenta = document.getElementById('btnPagarVenta');
+    const selectTipoPago = document.getElementById('ventaTipoPago'); // CORRECCIÓN 1: Referencia a elemento DOM
+    
+    let carrito = [];
+    let productosDisponibles = []; // CORRECCIÓN 2: Declaración de la variable
+
     /**
      * Función reutilizable para cerrar la sesión.
      */
@@ -563,15 +577,9 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', handleLogout);
     }
     
-    // --- CAJA: Registro de Ventas ---
-    const formVentaCaja = document.getElementById('form-venta-caja');
+    // --- CAJA: Lógica de Ventas ---
     if (formVentaCaja) {
         // Autocompletar datos del cliente al ingresar la cédula
-        const inputCedula = document.getElementById('ventaClienteCedula');
-        const inputNombre = document.getElementById('ventaClienteNombre');
-        const inputTelefono = document.getElementById('ventaClienteTelefono');
-        const inputEmail = document.getElementById('ventaClienteEmail');
-
         inputCedula.addEventListener('blur', async () => {
             const cedula = inputCedula.value.trim();
             if (!cedula) return;
@@ -580,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (data.cliente) {
                     inputNombre.value = data.cliente.nombre;
-                    // En la tabla, telefono es la cedula y email es el telefono
+                    // Uso seguro de inputTelefono e inputEmail
                     if (inputTelefono) inputTelefono.value = data.cliente.telefono || '';
                     if (inputEmail) inputEmail.value = data.cliente.email || '';
                 } else {
@@ -613,147 +621,150 @@ document.addEventListener('DOMContentLoaded', () => {
         precioUnitario.addEventListener('input', actualizarTotales);
         cantidad.addEventListener('input', actualizarTotales);
 
-        // --- CAJA: Manejo de Productos en Venta ---
-    const selectProducto = document.getElementById('ventaProducto');
-    const selectTalla = document.getElementById('ventaTalla');
-    const inputCantidad = document.getElementById('ventaCantidad');
-    const inputPrecioUnitario = document.getElementById('ventaPrecioUnitario');
-    const inputTotalDolar = document.getElementById('ventaTotalDolar');
-    const inputTotalBs = document.getElementById('ventaTotalBs');
-    const btnAgregarProducto = document.getElementById('btnAgregarProducto');
-    const ventaDetalle = document.getElementById('ventaDetalle');
-    const btnPagarVenta = document.getElementById('btnPagarVenta');
-    let carrito = [];
-
-    // Cargar productos disponibles en el select
-    async function cargarProductosCaja() {
-        try {
-            const res = await fetch('/api/admin/productos');
-            const data = await res.json();
-            productosDisponibles = data.productos || [];
-            selectProducto.innerHTML = '<option value="">Selecciona producto</option>';
-            productosDisponibles.forEach(prod => {
-                selectProducto.innerHTML += `<option value="${prod.id_producto}" data-precio="${prod.precio_venta}" data-nombre="${prod.nombre}" data-marca="${prod.marca}">${prod.marca} - ${prod.nombre}</option>`;
-            });
-        } catch {}
-    }
-    cargarProductosCaja();
-
-    // Al cambiar el producto, actualizar el precio unitario
-    selectProducto.addEventListener('change', () => {
-        const option = selectProducto.selectedOptions[0];
-        if (option) {
-            const precio = option.getAttribute('data-precio');
-            inputPrecioUnitario.value = precio;
-            // Actualizar tallas disponibles según el producto
-            const idProd = option.value;
-            cargarTallasPorProducto(idProd);
-        } else {
-            inputPrecioUnitario.value = '';
-            selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
-        }
-    });
-
-    // Cargar tallas disponibles para el producto seleccionado
-    async function cargarTallasPorProducto(idProducto) {
-        const res = await fetch(`/api/productos/${idProducto}`);
-        const data = await res.json();
-        const tallas = data.producto ? data.producto.tallas : [];
-        selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
-        tallas.forEach(talla => {
-            selectTalla.innerHTML += `<option value="${talla.id_talla}" data-cantidad="${talla.cantidad}">${talla.nombre} (${talla.cantidad} disponibles)</option>`;
-        });
-    }
-
-    btnAgregarProducto.addEventListener('click', () => {
-        const idProd = selectProducto.value;
-        const idTalla = selectTalla.value;
-        const optTalla = selectTalla.selectedOptions[0];
-        const optProd = selectProducto.selectedOptions[0];
-        const nombreProd = optProd ? optProd.getAttribute('data-nombre') : '';
-        const marcaProd = optProd ? optProd.getAttribute('data-marca') : '';
-        const nombreTalla = optTalla ? optTalla.textContent : '';
-        const cantidad = parseInt(inputCantidad.value) || 0;
-        const maxCant = optTalla ? parseInt(optTalla.getAttribute('data-cantidad')) : 0;
-        const precio = parseFloat(inputPrecioUnitario.value) || 0;
-        if (!idProd || !idTalla || cantidad < 1 || cantidad > maxCant) {
-            alert('Completa todos los campos y verifica la cantidad.');
-            return;
-        }
-        carrito.push({ idProd, nombreProd, marcaProd, idTalla, nombreTalla, cantidad, precio });
-        renderCarrito();
-        // Limpiar campos
-        selectProducto.value = '';
-        selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
-        inputCantidad.value = '';
-        inputPrecioUnitario.value = '';
-        inputTotalDolar.value = '';
-        inputTotalBs.value = '';
-    });
-
-    function renderCarrito() {
-        ventaDetalle.innerHTML = '';
-        if (carrito.length === 0) {
-            ventaDetalle.innerHTML = '<div class="item">Carrito vacío. Agrega productos para la venta.</div>';
-            return;
-        }
-        carrito.forEach((item, idx) => {
-            ventaDetalle.innerHTML += `<div class="item">${item.marcaProd} - ${item.nombreProd} - ${item.nombreTalla} x${item.cantidad} ($${item.precio}) <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarDelCarrito(${idx})'>Eliminar</button></div>`;
-        });
-    }
-
-    window.eliminarDelCarrito = function(index) {
-        carrito.splice(index, 1);
-        renderCarrito();
-    };
-
-    btnPagarVenta.addEventListener('click', async () => {
-        // Obtener datos del cliente
-        const cliente_nombre = document.getElementById('ventaClienteNombre').value.trim();
-        const cliente_cedula = document.getElementById('ventaClienteCedula').value.trim();
-        const cliente_telefono = document.getElementById('ventaClienteTelefono') ? document.getElementById('ventaClienteTelefono').value.trim() : '';
-        const cliente_email = document.getElementById('ventaClienteEmail') ? document.getElementById('ventaClienteEmail').value.trim() : '';
-        const tipo_pago = selectTipoPago.value;
-        if (!cliente_nombre || !cliente_cedula || carrito.length === 0 || !tipo_pago) {
-            alert('Completa todos los campos y agrega productos al carrito.');
-            return;
-        }
-        // Enviar cada producto como venta
-        let ok = true;
-        for (const item of carrito) {
-            const body = {
-                cliente_nombre,
-                cliente_cedula,
-                cliente_telefono,
-                cliente_email,
-                marca: item.marcaProd,
-                nombre: item.nombreProd,
-                talla: item.nombreTalla.split(' ')[0],
-                cantidad: item.cantidad,
-                precio_unitario: item.precio,
-                total_dolar: (item.precio * item.cantidad).toFixed(2),
-                total_bs: '', // Se puede calcular en backend
-                tipo_pago
-            };
+        // Cargar productos disponibles en el select
+        async function cargarProductosCaja() {
             try {
-                const res = await fetch('/api/ventas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
+                const res = await fetch('/api/admin/productos');
                 const data = await res.json();
-                if (!data.ok) ok = false;
-            } catch { ok = false; }
+                productosDisponibles = data.productos || [];
+                selectProducto.innerHTML = '<option value="">Selecciona producto</option>';
+                productosDisponibles.forEach(prod => {
+                    selectProducto.innerHTML += `<option value="${prod.id_producto}" data-precio="${prod.precio_venta}" data-nombre="${prod.nombre}" data-marca="${prod.marca}">${prod.marca} - ${prod.nombre}</option>`;
+                });
+            } catch {}
         }
-        if (ok) {
-            alert('Venta registrada correctamente.');
-            carrito = [];
+        cargarProductosCaja();
+
+        // Al cambiar el producto, actualizar el precio unitario
+        selectProducto.addEventListener('change', () => {
+            const option = selectProducto.selectedOptions[0];
+            if (option) {
+                const precio = option.getAttribute('data-precio');
+                inputPrecioUnitario.value = precio;
+                // Actualizar tallas disponibles según el producto
+                const idProd = option.value;
+                cargarTallasPorProducto(idProd);
+            } else {
+                inputPrecioUnitario.value = '';
+                selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+            }
+        });
+
+        // Cargar tallas disponibles para el producto seleccionado
+        async function cargarTallasPorProducto(idProducto) {
+            const res = await fetch(`/api/productos/${idProducto}`);
+            const data = await res.json();
+            const tallas = data.producto ? data.producto.tallas : [];
+            selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+            tallas.forEach(talla => {
+                selectTalla.innerHTML += `<option value="${talla.id_talla}" data-cantidad="${talla.cantidad}">${talla.nombre} (${talla.cantidad} disponibles)</option>`;
+            });
+        }
+
+        btnAgregarProducto.addEventListener('click', () => {
+            const idProd = selectProducto.value;
+            const idTalla = selectTalla.value;
+            const optTalla = selectTalla.selectedOptions[0];
+            const optProd = selectProducto.selectedOptions[0];
+            const nombreProd = optProd ? optProd.getAttribute('data-nombre') : '';
+            const marcaProd = optProd ? optProd.getAttribute('data-marca') : '';
+            const nombreTalla = optTalla ? optTalla.textContent.match(/(.*)\s\(/)[1].trim() : ''; // Obtiene solo el nombre de la talla
+            const cantidad = parseInt(inputCantidad.value) || 0;
+            const maxCant = optTalla ? parseInt(optTalla.getAttribute('data-cantidad')) : 0;
+            const precio = parseFloat(inputPrecioUnitario.value) || 0;
+            
+            if (!idProd || !idTalla || cantidad < 1 || cantidad > maxCant) {
+                alert('Completa todos los campos y verifica la cantidad disponible.');
+                return;
+            }
+            // Incluir idProd e idTalla en el carrito
+            carrito.push({ idProd, nombreProd, marcaProd, idTalla, nombreTalla, cantidad, precio });
             renderCarrito();
-            formVentaCaja.reset();
+            // Limpiar campos
+            selectProducto.value = '';
+            selectTalla.innerHTML = '<option value="">Selecciona talla</option>';
+            inputCantidad.value = '';
+            inputPrecioUnitario.value = '';
             inputTotalDolar.value = '';
             inputTotalBs.value = '';
-        } else {
-            alert('Error al registrar venta.');
+        });
+
+        function renderCarrito() {
+            ventaDetalle.innerHTML = '';
+            let subtotal = 0;
+            if (carrito.length === 0) {
+                ventaDetalle.innerHTML = '<div class="item">Carrito vacío. Agrega productos para la venta.</div>';
+                return;
+            }
+            carrito.forEach((item, idx) => {
+                const totalItem = item.precio * item.cantidad;
+                subtotal += totalItem;
+                ventaDetalle.innerHTML += `<div class="item">${item.marcaProd} - ${item.nombreProd} - ${item.nombreTalla} x${item.cantidad} ($${totalItem.toFixed(2)}) <button class='btn danger' style='background:#ef4444;color:#fff;margin-left:10px;' onclick='eliminarDelCarrito(${idx})'>Eliminar</button></div>`;
+            });
+            ventaDetalle.innerHTML += `<div class="item" style="border-top: 1px solid #ccc; margin-top: 10px; padding-top: 10px;"><b>Total Carrito: $${subtotal.toFixed(2)}</b></div>`;
         }
-    });
+
+        window.eliminarDelCarrito = function(index) {
+            carrito.splice(index, 1);
+            renderCarrito();
+        };
+
+        btnPagarVenta.addEventListener('click', async () => {
+            // Obtener datos del cliente (Uso seguro de referencias)
+            const cliente_nombre = inputNombre.value.trim();
+            const cliente_cedula = inputCedula.value.trim();
+            const cliente_telefono = inputTelefono ? inputTelefono.value.trim() : '';
+            const cliente_email = inputEmail ? inputEmail.value.trim() : '';
+            const tipo_pago = selectTipoPago ? selectTipoPago.value : '';
+            
+            if (!cliente_nombre || !cliente_cedula || carrito.length === 0 || !tipo_pago) {
+                alert('Completa todos los campos del cliente, agrega productos al carrito y selecciona el tipo de pago.');
+                return;
+            }
+            
+            let ok = true;
+            for (const item of carrito) {
+                // CORRECCIÓN 4: Enviar id_producto e id_talla al backend para una gestión de inventario precisa
+                const body = {
+                    cliente_nombre,
+                    cliente_cedula,
+                    cliente_telefono,
+                    cliente_email,
+                    id_producto: item.idProd, // Usar ID del producto
+                    id_talla: item.idTalla,   // Usar ID de la talla
+                    cantidad: item.cantidad,
+                    precio_unitario: item.precio,
+                    // Se deja total_dolar y total_bs para el backend, solo enviando los datos de la transacción
+                    tipo_pago
+                };
+                try {
+                    const res = await fetch('/api/ventas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await res.json();
+                    if (!data.ok) {
+                        ok = false;
+                        console.error('Error al registrar venta de producto:', item.nombreProd, data.error);
+                    }
+                } catch (e) { 
+                    ok = false; 
+                    console.error('Error de conexión al registrar venta:', e);
+                }
+            }
+            if (ok) {
+                alert('Venta registrada correctamente.');
+                carrito = [];
+                renderCarrito();
+                formVentaCaja.reset();
+                inputTotalDolar.value = '';
+                inputTotalBs.value = '';
+                // Recargar productos para reflejar el nuevo stock
+                cargarProductosCaja(); 
+            } else {
+                alert('Ocurrió un error al registrar una o más ventas. Revise la consola para detalles.');
+            }
+        });
+    }
 });
