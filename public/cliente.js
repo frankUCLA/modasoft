@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function mostrarTallasDinamicas() {
         if (!tallasDinamicasDiv) return;
         try {
-            const res = await fetch('/api/datos.php?tabla=tallas');
+            const res = await fetch('/api/tallas');
             const data = await res.json();
             tallasDinamicasDiv.innerHTML = '';
             data.tallas.forEach(talla => {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const catalogoTallas = document.getElementById('catalogoTallas');
     async function cargarTallas() {
         try {
-            const res = await fetch('/api/datos.php?tabla=tallas');
+            const res = await fetch('/api/tallas');
             const data = await res.json();
             if (catalogoTallas) {
                 catalogoTallas.innerHTML = '';
@@ -49,10 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const largo = parseInt(document.getElementById('tallaLargo').value) || null;
             if (!nombre || !ajuste) return;
             try {
-                const res = await fetch('/api/datos.php?tabla=tallas', {
+                const nombre = document.getElementById('tallaNombre').value.trim();
+                const ajuste = document.getElementById('tallaAjuste').value;
+                const pecho = parseInt(document.getElementById('tallaPecho').value) || null;
+                const cintura = parseInt(document.getElementById('tallaCintura').value) || null;
+                const cadera = parseInt(document.getElementById('tallaCadera').value) || null;
+                const largo = parseInt(document.getElementById('tallaLargo').value) || null;
+                const res = await fetch('/api/tallas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre })
+                    body: JSON.stringify({ nombre, ajuste, pecho, cintura, cadera, largo })
                 });
                 const data = await res.json();
                 if (data.ok) {
