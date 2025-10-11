@@ -408,6 +408,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CAJA: Registro de Ventas ---
     const formVentaCaja = document.getElementById('form-venta-caja');
     if (formVentaCaja) {
+        // Autocompletar datos del cliente al ingresar la cédula
+        const inputCedula = document.getElementById('ventaClienteCedula');
+        const inputNombre = document.getElementById('ventaClienteNombre');
+        const inputTelefono = document.getElementById('ventaClienteTelefono');
+        const inputEmail = document.getElementById('ventaClienteEmail');
+
+        inputCedula.addEventListener('blur', async () => {
+            const cedula = inputCedula.value.trim();
+            if (!cedula) return;
+            try {
+                const res = await fetch(`/api/clientes/buscar?cedula=${encodeURIComponent(cedula)}`);
+                const data = await res.json();
+                if (data.cliente) {
+                    inputNombre.value = data.cliente.nombre;
+                    // En la tabla, telefono es la cedula y email es el telefono
+                    if (inputTelefono) inputTelefono.value = data.cliente.telefono || '';
+                    if (inputEmail) inputEmail.value = data.cliente.email || '';
+                } else {
+                    inputNombre.value = '';
+                    if (inputTelefono) inputTelefono.value = '';
+                    if (inputEmail) inputEmail.value = '';
+                }
+            } catch {}
+        });
         // Actualizar totales automáticamente
         const precioUnitario = document.getElementById('ventaPrecioUnitario');
         const cantidad = document.getElementById('ventaCantidad');

@@ -262,6 +262,21 @@ app.post('/api/admin/productos', requiereRol('administrador'), async (req, res) 
 });
 
 // ---------------- Caja (rutas protegidas) ----------------
+// Buscar cliente por cédula
+app.get('/api/clientes/buscar', requiereRol('caja'), async (req, res) => {
+  const cedula = req.query.cedula;
+  if (!cedula) return res.json({ cliente: null });
+  try {
+    const [rows] = await pool.query('SELECT id_cliente, nombre, telefono, email FROM Clientes WHERE telefono = ? LIMIT 1', [cedula]);
+    if (rows.length > 0) {
+      res.json({ cliente: rows[0] });
+    } else {
+      res.json({ cliente: null });
+    }
+  } catch (e) {
+    res.json({ cliente: null });
+  }
+});
 // Nuevo endpoint: Registro de ventas completo (usado por caja.html)
 app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
   const { cliente_nombre, cliente_cedula, marca, talla, cantidad, precio_unitario, total_dolar, total_bs, tipo_pago } = req.body;
@@ -285,9 +300,9 @@ app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
     // Buscar id_producto por marca (simplificado)
     const [prodRows] = await pool.query('SELECT id_producto FROM Productos WHERE marca = ? LIMIT 1', [marca]);
     let id_producto = prodRows.length > 0 ? prodRows[0].id_producto : null;
-    // Buscar id_talla
-    const [tallaRows] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre_talla = ?', [talla]);
-    let id_talla = tallaRows.length > 0 ? tallaRows[0].id_talla : null;
+  // Buscar id_talla
+  const [tallaRows] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre = ?', [talla]);
+  let id_talla = tallaRows.length > 0 ? tallaRows[0].id_talla : null;
     if (id_producto && id_talla) {
       await pool.query('INSERT INTO DetalleVenta (id_venta, id_producto, id_talla, cantidad, precio_unitario) VALUES (?, ?, ?, ?, ?)', [id_venta, id_producto, id_talla, cantidad, precio_unitario]);
     }
