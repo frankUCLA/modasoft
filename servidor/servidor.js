@@ -154,7 +154,7 @@ app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
     // 2. Insertar cantidades por talla en InventarioTallas
     if (Array.isArray(cantidades)) {
       for (const t of cantidades) {
-        await pool.query('INSERT INTO InventarioTallas (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, t.id_talla, t.cantidad]);
+        await pool.query('INSERT INTO Inventario (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, t.id_talla, t.cantidad]);
       }
     }
     res.json({ ok: true, id_producto });
