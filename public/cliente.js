@@ -93,10 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch { adminProductos.innerHTML = '<div class="item">Error al cargar productos.</div>'; }
     }
-    window.editarProducto = function(id) {
-        alert('Funcionalidad de edición en desarrollo.');
-        // Aquí puedes abrir un modal o formulario para editar el producto
-    };
+    // (Ya está definida la versión funcional de window.editarProducto más arriba)
     window.eliminarProducto = async function(id) {
         if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
         try {
