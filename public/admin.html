@@ -34,19 +34,50 @@
             <div id="inventarioPanel" class="panel tabContent">
                 <h3>Gestión de Productos</h3>
                 <div class="row header-row">
-                    <h4>Crear Producto</h4>
-                </div>
-                <div class="row form-row">
-                    <div class="col">
-                        <input id="prodNombre" placeholder="Nombre del Producto" class="input">
-                    </div>
-                    <div class="col">
-                        <input id="prodPrecio" placeholder="Precio" type="number" step="0.01" class="input">
-                    </div>
-                    <div class="col">
-                        <button id="btnCrearProd" class="btn primary">Crear Producto</button>
-                    </div>
-                </div>
+                                        <h4>Crear Producto</h4>
+                                </div>
+                                <form id="form-producto-admin">
+                                    <div class="row form-row">
+                                        <div class="col">
+                                            <input id="prodMarca" placeholder="Marca" class="input" required>
+                                        </div>
+                                        <div class="col">
+                                            <select id="prodCategoria" class="input" required>
+                                                <option value="">Selecciona Categoría</option>
+                                                <!-- Opciones dinámicas -->
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <select id="prodProveedor" class="input" required>
+                                                <option value="">Selecciona Proveedor</option>
+                                                <!-- Opciones dinámicas -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row form-row">
+                                        <div class="col">
+                                            <input id="prodNombre" placeholder="Nombre del Producto" class="input" required>
+                                        </div>
+                                        <div class="col">
+                                            <input id="prodPrecio" placeholder="Precio ($)" type="number" step="0.01" class="input" required>
+                                        </div>
+                                        <div class="col">
+                                            <input id="prodInventario" placeholder="Inventario total" type="number" min="0" class="input" required>
+                                        </div>
+                                    </div>
+                                    <div class="row form-row">
+                                        <fieldset style="border:1px solid #ccc; padding:10px;">
+                                            <legend>Tallas y Cantidades</legend>
+                                            <label>S:<input type="number" id="talla_s" min="0" value="0" style="width:60px;"></label>
+                                            <label>M:<input type="number" id="talla_m" min="0" value="0" style="width:60px;"></label>
+                                            <label>L:<input type="number" id="talla_l" min="0" value="0" style="width:60px;"></label>
+                                            <label>XL:<input type="number" id="talla_xl" min="0" value="0" style="width:60px;"></label>
+                                        </fieldset>
+                                    </div>
+                                    <div class="row form-row">
+                                        <button id="btnCrearProd" class="btn primary" type="submit">Registrar Producto</button>
+                                    </div>
+                                </form>
                 
                 <div class="row header-row">
                     <h4>Listado de Productos</h4>
@@ -99,29 +130,44 @@
             <!-- 3. TRANSACCIONES Y REPORTES -->
             <div id="transaccionesPanel" class="panel tabContent" style="display:none;">
                 <h2 style="color: #3b82f6;">Reportes y Movimientos</h2>
-                
+                <!-- Reportes Gerenciales -->
+                <h3>Indicadores Gerenciales</h3>
+                <ul>
+                  <li>Rotación de Inventario</li>
+                  <li>Análisis de Ventas por Temporada (seleccionable)</li>
+                  <li>Control de Margen de Ganancias por Categoría</li>
+                  <li>Reporte de Utilidad por Producto</li>
+                </ul>
                 <!-- Placeholder para Ventas -->
                 <h3>Listado de Ventas (Facturas)</h3>
                 <div id="reporteVentas" class="list">
                     <div class="item">Cargando ventas recientes...</div>
                 </div>
-
                 <!-- Placeholder para Movimientos de Caja -->
                 <h3>Movimientos Contables y de Caja</h3>
                 <div id="reporteCaja" class="list">
                     <div class="item">Cargando movimientos contables...</div>
                 </div>
-                
                 <!-- Placeholder para Clientes -->
                 <h3>Listado de Clientes</h3>
                 <div id="reporteClientes" class="list">
                     <div class="item">Cargando lista de clientes...</div>
                 </div>
-                
                 <!-- Placeholder para Compras -->
                 <h3>Listado de Órdenes de Compra</h3>
                 <div id="reporteCompras" class="list">
                     <div class="item">Cargando lista de compras...</div>
+                </div>
+                <!-- Placeholder para Devoluciones -->
+                <h3>Gestión de Devoluciones (Clave requerida)</h3>
+                <form id="form-devolucion">
+                  <label>Clave de acceso:<input type="password" id="claveDevolucion" required></label>
+                  <button type="submit" class="btn secondary">Acceder</button>
+                </form>
+                <div id="panelDevoluciones" style="display:none;">
+                  <label>Buscar venta por fecha y hora:<input type="datetime-local" id="buscaVentaFecha"></label>
+                  <button id="btnBuscarVenta" class="btn">Buscar Venta</button>
+                  <div id="devolucionResultados"></div>
                 </div>
             </div>
             

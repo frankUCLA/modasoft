@@ -74,6 +74,36 @@ app.post('/api/logout', (req, res) => {
 });
 
 // ---------------- Administrador (rutas protegidas) ----------------
+// Nuevo endpoint: Registro de productos completo (usado por admin.html)
+app.post('/api/productos', requiereRol('administrador'), async (req, res) => {
+  const { marca, categoria, proveedor, nombre, precio, inventario, talla_s, talla_m, talla_l, talla_xl } = req.body;
+  try {
+    // 1. Insertar producto principal
+    const [prodResult] = await pool.query(
+      'INSERT INTO Productos (nombre, marca, precio_venta, inventario, id_categoria, id_proveedor) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, marca, precio, inventario, categoria, proveedor]
+    );
+    const id_producto = prodResult.insertId;
+    // 2. Insertar tallas (S, M, L, XL) en tabla de inventario por talla
+    const tallas = [
+      { talla: 'S', cantidad: talla_s },
+      { talla: 'M', cantidad: talla_m },
+      { talla: 'L', cantidad: talla_l },
+      { talla: 'XL', cantidad: talla_xl }
+    ];
+    for (const t of tallas) {
+      // Buscar id_talla por nombre
+      const [tallaRow] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre_talla = ?', [t.talla]);
+      if (tallaRow.length > 0) {
+        await pool.query('INSERT INTO InventarioTallas (id_producto, id_talla, cantidad) VALUES (?, ?, ?)', [id_producto, tallaRow[0].id_talla, t.cantidad]);
+      }
+    }
+    res.json({ ok: true, id_producto });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Error al registrar producto' });
+  }
+});
 // Listar productos (GET)
 app.get('/api/admin/productos', requiereRol('administrador'), async (req, res) => {
   const { q } = req.query;
@@ -111,6 +141,46 @@ app.post('/api/admin/productos', requiereRol('administrador'), async (req, res) 
 });
 
 // ---------------- Caja (rutas protegidas) ----------------
+// Nuevo endpoint: Registro de ventas completo (usado por caja.html)
+app.post('/api/ventas', requiereRol('caja'), async (req, res) => {
+  const { cliente_nombre, cliente_cedula, marca, talla, cantidad, precio_unitario, total_dolar, total_bs, tipo_pago } = req.body;
+  try {
+    // 1. Buscar o crear cliente
+    let id_cliente = null;
+    const [cliRows] = await pool.query('SELECT id_cliente FROM Clientes WHERE nombre = ? AND telefono = ?', [cliente_nombre, cliente_cedula]);
+    if (cliRows.length > 0) {
+      id_cliente = cliRows[0].id_cliente;
+    } else {
+      const [cliRes] = await pool.query('INSERT INTO Clientes (nombre, telefono) VALUES (?, ?)', [cliente_nombre, cliente_cedula]);
+      id_cliente = cliRes.insertId;
+    }
+    // 2. Registrar venta principal
+    const [ventaRes] = await pool.query(
+      'INSERT INTO Ventas (fecha_hora, total_venta, tipo_pago, id_usuario, id_cliente) VALUES (NOW(), ?, ?, ?, ?)',
+      [total_dolar, tipo_pago, req.session.user.id, id_cliente]
+    );
+    const id_venta = ventaRes.insertId;
+    // 3. Registrar detalle de venta
+    // Buscar id_producto por marca (simplificado)
+    const [prodRows] = await pool.query('SELECT id_producto FROM Productos WHERE marca = ? LIMIT 1', [marca]);
+    let id_producto = prodRows.length > 0 ? prodRows[0].id_producto : null;
+    // Buscar id_talla
+    const [tallaRows] = await pool.query('SELECT id_talla FROM Tallas WHERE nombre_talla = ?', [talla]);
+    let id_talla = tallaRows.length > 0 ? tallaRows[0].id_talla : null;
+    if (id_producto && id_talla) {
+      await pool.query('INSERT INTO DetalleVenta (id_venta, id_producto, id_talla, cantidad, precio_unitario) VALUES (?, ?, ?, ?, ?)', [id_venta, id_producto, id_talla, cantidad, precio_unitario]);
+    }
+    res.json({ ok: true, id_venta });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Error al registrar venta' });
+  }
+});
+// Endpoint para tasa BCV (simulado)
+app.get('/api/tasa-bcv', async (req, res) => {
+  // Aquí deberías consultar una API real, pero devolvemos un valor fijo de ejemplo
+  res.json({ tasa: 36 });
+});
 // Registro de venta simple (AJUSTADO para coincidir con la llamada simple del front-end)
 app.post('/api/caja/venta', requiereRol('caja'), async (req, res) => {
   const { id_cliente, monto } = req.body;

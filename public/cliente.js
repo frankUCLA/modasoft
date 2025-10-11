@@ -1,4 +1,112 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ADMINISTRADOR: Registro de Productos ---
+    const formProductoAdmin = document.getElementById('form-producto-admin');
+    if (formProductoAdmin) {
+        formProductoAdmin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Obtener datos del formulario
+            const marca = document.getElementById('prodMarca').value.trim();
+            const categoria = document.getElementById('prodCategoria').value;
+            const proveedor = document.getElementById('prodProveedor').value;
+            const nombre = document.getElementById('prodNombre').value.trim();
+            const precio = parseFloat(document.getElementById('prodPrecio').value);
+            const inventario = parseInt(document.getElementById('prodInventario').value);
+            const talla_s = parseInt(document.getElementById('talla_s').value);
+            const talla_m = parseInt(document.getElementById('talla_m').value);
+            const talla_l = parseInt(document.getElementById('talla_l').value);
+            const talla_xl = parseInt(document.getElementById('talla_xl').value);
+
+            // Validación básica
+            if (!marca || !categoria || !proveedor || !nombre || isNaN(precio) || isNaN(inventario)) {
+                alert('Completa todos los campos obligatorios.');
+                return;
+            }
+
+            // Enviar al backend
+            try {
+                const res = await fetch('/api/productos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ marca, categoria, proveedor, nombre, precio, inventario, talla_s, talla_m, talla_l, talla_xl })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    alert('Producto registrado correctamente.');
+                    formProductoAdmin.reset();
+                } else {
+                    alert('Error al registrar producto: ' + (data.error || '')); 
+                }
+            } catch (err) {
+                alert('Error de conexión al guardar producto.');
+            }
+        });
+    }
+
+    // --- CAJA: Registro de Ventas ---
+    const formVentaCaja = document.getElementById('form-venta-caja');
+    if (formVentaCaja) {
+        // Actualizar totales automáticamente
+        const precioUnitario = document.getElementById('ventaPrecioUnitario');
+        const cantidad = document.getElementById('ventaCantidad');
+        const totalDolar = document.getElementById('ventaTotalDolar');
+        const totalBs = document.getElementById('ventaTotalBs');
+
+        async function actualizarTotales() {
+            const precio = parseFloat(precioUnitario.value) || 0;
+            const cant = parseInt(cantidad.value) || 0;
+            const total = precio * cant;
+            totalDolar.value = total.toFixed(2);
+            // Obtener tasa BCV
+            let tasa = 36; // Valor fijo de ejemplo, deberías obtenerlo de una API real
+            try {
+                const res = await fetch('/api/tasa-bcv');
+                const data = await res.json();
+                if (data.tasa) tasa = parseFloat(data.tasa);
+            } catch {}
+            totalBs.value = (total * tasa).toFixed(2);
+        }
+        precioUnitario.addEventListener('input', actualizarTotales);
+        cantidad.addEventListener('input', actualizarTotales);
+
+        formVentaCaja.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Obtener datos del formulario
+            const cliente_nombre = document.getElementById('ventaClienteNombre').value.trim();
+            const cliente_cedula = document.getElementById('ventaClienteCedula').value.trim();
+            const marca = document.getElementById('ventaMarca').value.trim();
+            const talla = document.getElementById('ventaTalla').value;
+            const cantidadVal = parseInt(document.getElementById('ventaCantidad').value);
+            const precio_unitario = parseFloat(document.getElementById('ventaPrecioUnitario').value);
+            const total_dolar = parseFloat(document.getElementById('ventaTotalDolar').value);
+            const total_bs = parseFloat(document.getElementById('ventaTotalBs').value);
+            const tipo_pago = document.getElementById('ventaTipoPago').value;
+
+            if (!cliente_nombre || !cliente_cedula || !marca || !talla || isNaN(cantidadVal) || isNaN(precio_unitario)) {
+                alert('Completa todos los campos obligatorios.');
+                return;
+            }
+
+            // Enviar al backend
+            try {
+                const res = await fetch('/api/ventas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cliente_nombre, cliente_cedula, marca, talla, cantidad: cantidadVal, precio_unitario, total_dolar, total_bs, tipo_pago })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    alert('Venta registrada correctamente.');
+                    formVentaCaja.reset();
+                    totalDolar.value = '';
+                    totalBs.value = '';
+                } else {
+                    alert('Error al registrar venta: ' + (data.error || ''));
+                }
+            } catch (err) {
+                alert('Error de conexión al guardar venta.');
+            }
+        });
+    }
     // 1. Elementos del DOM
     const loginSection = document.getElementById('loginSection');
     const loginBtn = document.getElementById('loginBtn');

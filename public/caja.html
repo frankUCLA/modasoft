@@ -28,16 +28,55 @@
           <h4>Nueva Transacción</h4>
         </div>
         <div class="row form-row">
-          <div class="col">
-            <input id="ventaCliente" placeholder="ID Cliente (opcional)" class="input">
-          </div>
-          <div class="col">
-            <input id="ventaTotal" placeholder="Total venta" type="number" step="0.01" class="input">
-          </div>
-          <div class="col">
-            <button id="btnNuevaVenta" class="btn primary">Registrar venta</button>
-          </div>
-        </div>
+          <form id="form-venta-caja" style="width:100%;">
+            <div class="row form-row">
+              <div class="col">
+                <input id="ventaClienteNombre" placeholder="Nombre del Cliente" class="input" required>
+              </div>
+              <div class="col">
+                <input id="ventaClienteCedula" placeholder="Cédula" class="input" required>
+              </div>
+            </div>
+            <div class="row form-row">
+              <div class="col">
+                <input id="ventaMarca" placeholder="Marca de la Ropa" class="input" required>
+              </div>
+              <div class="col">
+                <select id="ventaTalla" class="input" required>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                </select>
+              </div>
+              <div class="col">
+                <input id="ventaCantidad" placeholder="Cantidad" type="number" min="1" class="input" required>
+              </div>
+            </div>
+            <div class="row form-row">
+              <div class="col">
+                <input id="ventaPrecioUnitario" placeholder="Precio unitario ($)" type="number" step="0.01" class="input" required>
+              </div>
+              <div class="col">
+                <input id="ventaTotalDolar" placeholder="Total ($)" type="text" class="input" readonly>
+              </div>
+              <div class="col">
+                <input id="ventaTotalBs" placeholder="Total (Bs)" type="text" class="input" readonly>
+              </div>
+            </div>
+            <div class="row form-row">
+              <div class="col">
+                <select id="ventaTipoPago" class="input" required>
+                  <option value="Pago Móvil">Pago Móvil</option>
+                  <option value="Efectivo Dólares">Efectivo Dólares</option>
+                  <option value="Punto">Punto</option>
+                </select>
+              </div>
+              <div class="col">
+                <button id="btnNuevaVenta" class="btn primary" type="submit">Registrar venta</button>
+              </div>
+            </div>
+          </form>
         <div id="ventaDetalle" class="list">
            <div class="item">Ventas registradas aparecerán aquí.</div>
         </div>
