@@ -49,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const largo = parseInt(document.getElementById('tallaLargo').value) || null;
             if (!nombre || !ajuste) return;
             try {
-                const res = await fetch('/api/tallas', {
+                const res = await fetch('/api/datos.php?tabla=tallas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, ajuste, pecho, cintura, cadera, largo })
+                    body: JSON.stringify({ nombre })
                 });
                 const data = await res.json();
                 if (data.ok) {
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     alert('Error al crear talla');
                 }
-            } catch { alert('Error de conexión'); }
+            } catch (err) { alert('Error de conexión'); }
         });
         cargarTallas();
     }

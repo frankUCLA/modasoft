@@ -21,6 +21,24 @@ try {
     // Permite seleccionar la tabla a consultar
     $tabla = isset($_GET['tabla']) ? $_GET['tabla'] : 'productos';
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tabla === 'tallas') {
+        // Recibe datos en JSON
+        $input = json_decode(file_get_contents('php://input'), true);
+        $nombre = isset($input['nombre']) ? trim($input['nombre']) : '';
+        if (!$nombre || strlen($nombre) > 10) {
+            echo json_encode(["ok" => false, "error" => "Nombre de talla inválido o muy largo."]);
+            exit;
+        }
+        try {
+            $stmt = $pdo->prepare("INSERT INTO Tallas (nombre) VALUES (?)");
+            $stmt->execute([$nombre]);
+            echo json_encode(["ok" => true]);
+        } catch (PDOException $e) {
+            echo json_encode(["ok" => false, "error" => $e->getMessage()]);
+        }
+        exit;
+    }
+
     if ($tabla === 'tallas') {
         $stmt = $pdo->query("SELECT id_talla, nombre FROM Tallas ORDER BY id_talla DESC");
         $rows = $stmt->fetchAll();
