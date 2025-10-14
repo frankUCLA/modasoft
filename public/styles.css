@@ -1,184 +1,207 @@
-/*
- * styles_login.css - Estilo Futurista Corporativo para Login
- */
-
+/* ==================================== */
+/* 1. Variables Base y Reset */
+/* ==================================== */
 :root {
-    --primary-color: #007bff;   /* Azul de acento (Serio) */
-    --secondary-color: #6c757d; 
-    --background-dark: #0a0a0a; 
-    --surface-dark: #1e1e1e;    
-    --text-light: #f0f0f0;      
-    --border-color: #333;
-    --shadow-tech: 0 0 15px rgba(0, 123, 255, 0.4);
-    --error-color: #dc3545;
+    --color-bg-dark: #0f162a; /* Fondo muy oscuro, casi negro-azulado */
+    --color-bg-card: rgba(30, 45, 70, 0.95); /* Fondo de tarjeta semitransparente azul oscuro */
+    --color-border-glow: #007bff; /* Azul vibrante para bordes y brillos */
+    --color-text-light: #e0f7fa; /* Texto claro */
+    --color-input-bg: rgba(255, 255, 255, 0.1); /* Fondo de input muy sutil */
+    --color-input-text: #ffffff; /* Texto dentro del input */
+    --color-primary-btn: linear-gradient(to top, #007bff, #00bfff); /* Gradiente para botón */
+    --color-status-ok: #4caf50; /* ¡El color verde para el estado! */
+    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --shadow-glow: 0 0 15px rgba(0, 123, 255, 0.6);
 }
 
-/* ------------------- Globales y Centrado CLAVE ------------------- */
-body {
-    font-family: 'Roboto Mono', 'Consolas', monospace;
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: var(--background-dark);
-    color: var(--text-light);
+}
+
+/* ==================================== */
+/* 2. Estilo de Pantalla Completa y Fondo */
+/* ==================================== */
+
+body, html{
+    height: 100%;
+    font-family: var(--font-family-base);
+    color: var(--color-text-light);
+    background-color: var(--color-bg-dark); /* Color de respaldo si la imagen falla */
     
-    /* 🔑 CLAVE: FUERZA EL BODY A OCUPAR 100% Y USA FLEX PARA CENTRAR */
+    /* URL de una imagen pública de fondo tecnológico */
+    background-image: url('tech-background3.jpeg');
+    background-size: cover; /* Asegura que cubra toda la pantalla */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que se repita */
+    
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    justify-content: center;
     align-items: center; 
+    overflow: hidden; 
 }
-
+/* El contenedor principal abarca el espacio y centra el contenido */
 .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    flex-grow: 1; 
+    width: 100%; 
+    max-width: 450px; /* Limita el ancho para un mejor posicionamiento del estado */
+    height: 100%; 
+    position: relative; /* Esencial para posicionar el header absoluto */
+    padding: 0;
     display: flex;
     flex-direction: column;
-}
-
-/* ------------------- Área de Contenido Principal (Login) ------------------- */
-.main {
-    /* 🔑 Centra la tarjeta vertical y horizontalmente dentro del espacio restante */
-    flex-grow: 1; 
-    display: flex;
     justify-content: center; 
-    align-items: center; 
-    width: 100%;
-    position: static; 
-}
-
-/* ------------------- Tarjeta de Login (Card) ------------------- */
-.card {
-    background: var(--surface-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 35px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), var(--shadow-tech);
-    width: 100%;
-    max-width: 350px; 
-    color: var(--text-light);
-    margin: auto; 
-}
-
-/* Resto de estilos (Header, Inputs, Botones, etc.) */
-.header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--primary-color);
-    box-shadow: 0 1px 0 var(--primary-color); 
 }
 
-.header h1 {
+/* ==================================== */
+/* 3. Header y Estado (Lo Verde) */
+/* ==================================== */
+
+.header {
+    /* Posicionamiento del estado en la esquina superior derecha, fuera de la tarjeta */
+    position: absolute; 
+    top: 20px; 
+    right: 20px;
+    width: auto;
+    padding: 0;
     margin: 0;
-    font-size: 1.5em;
-    color: var(--primary-color);
 }
 
-.status-msg {
-    font-size: 0.85em;
-    font-weight: bold;
-    padding: 4px 8px;
-    border: 1px solid var(--secondary-color);
-    border-radius: 2px;
-    color: var(--secondary-color);
+/* Ocultamos el título H1 "ERP simple - Modasoft" */
+.header h1 {
+    display: none; 
 }
 
-#loginSection {
+/* Estilo del indicador de estado (el elemento que tiene lo verde) */
+#statusDisplay {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    border: 1px solid var(--color-status-ok); 
+    color: var(--color-status-ok); /* ¡Aplica el color verde al texto! */
+    border-radius: 4px;
+    background-color: rgba(76, 175, 80, 0.1); /* Fondo verde muy sutil */
+    display: block;
+    white-space: nowrap; /* Para que no se rompa la línea */
+}
+
+/* ==================================== */
+/* 4. Tarjeta de Login (Card) */
+/* ==================================== */
+
+.card {
+    background: var(--color-bg-card);
+    border: 1px solid rgba(0, 123, 255, 0.3);
+    border-radius: 20px;
+    
+    /* MODIFICACIÓN: Reducimos el padding vertical de 40px a 25px */
+    padding: 1px 40px; 
+    
+    width: 100%;
+    max-width: 380px; 
+    box-shadow: var(--shadow-glow);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section {
     text-align: center;
 }
 
-#loginSection h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    color: var(--text-light);
-    font-weight: 500;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed var(--border-color);
-    text-transform: uppercase;
+/* Implementación del "MODASOFT" encima del título */
+.card::before {
+    content: "MODASOFT"; 
+    display: block;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--color-border-glow);
+    margin-bottom: 10px;
+    text-shadow: var(--shadow-glow);
 }
+
+.section h2 {
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    letter-spacing: 1.5px;
+    color: var(--color-text-light);
+    text-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+/* ==================================== */
+/* 5. Inputs y Botón */
+/* ==================================== */
 
 .field {
-    text-align: left;
     margin-bottom: 20px;
-    position: relative;
+    text-align: left;
 }
 
-.field label { display: none; }
+.field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+}
 
-.field input {
+.field input[type="text"],
+.field input[type="password"] {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--background-dark); 
-    color: var(--text-light);
-    font-size: 0.9em;
-    box-sizing: border-box;
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 8px;
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    font-size: 1em;
+    outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
-    padding-left: 40px !important; 
 }
 
 .field input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-tech);
+    border-color: var(--color-border-glow);
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ÍCONOS */
-#loginSection .field:nth-child(1)::before {
-    content: '👤'; 
-    position: absolute;
-    top: 50%; 
-    transform: translateY(-50%);
-    left: 10px;
-    font-size: 1em;
-    color: var(--secondary-color);
-    z-index: 10;
+.field input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
-#loginSection .field:nth-child(2)::before {
-    content: '🔒'; 
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 10px;
-    font-size: 1em;
-    color: var(--secondary-color);
-    z-index: 10;
-}
-
-/* Botones */
 .btn {
-    padding: 12px 20px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
+    border-radius: 8px;
+    font-size: 1.1em;
     font-weight: bold;
-    transition: all 0.3s;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
     text-transform: uppercase;
 }
 
-.btn.primary, #loginBtn {
-    background-color: var(--primary-color);
-    color: white;
-    width: 100%;
-    margin-top: 15px;
-    box-shadow: var(--shadow-tech);
+.btn.primary {
+    background: var(--color-primary-btn);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.5);
 }
 
 .btn.primary:hover {
-    background-color: #0056b3; 
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.8);
+}
+
+.btn.primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.5);
 }
 
 .msg {
-    margin-top: 15px;
-    font-size: 0.9em;
-    font-weight: bold;
-    color: var(--error-color);
+    margin-top: 25px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.6);
 }
